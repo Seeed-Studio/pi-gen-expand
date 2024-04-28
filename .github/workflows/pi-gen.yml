@@ -1,0 +1,52 @@
+name: Build and upload image
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  
+jobs:
+  reComuputer-R100x-64-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: before Build
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install dialog coreutils quilt parted qemu-user-static debootstrap zerofree zip dosfstools \
+            libarchive-tools libcap2-bin grep rsync xz-utils file git curl bc qemu-utils kpartx gpg pigz xxd kmod binfmt-support
+
+      - name: Getting parameter configuration
+        run: |
+          cp -rf dev_config/reComputer-R100x/* stage4a/00-dtoverlays/
+          chmod +x stage4a/prerun.sh
+          chmod +x stage4a/00-dtoverlays/*.sh
+
+      - name: Add SKIP_IMAGES in stage2
+        run: |
+          mkdir -p clean-stage &&
+          {
+          cat > clean-stage/prerun.sh <<-EOF
+          #!/bin/bash
+          cd ${{ github.workspace }}/pi-gen
+          touch ./stage2/SKIP_IMAGES
+          EOF
+          } &&
+          chmod +x clean-stage/prerun.sh
+      - name: Build pi-gen with stage4a
+        uses: usimd/pi-gen-action@v1
+        id: build
+        with:
+          image-name: 'reComputer-R100x-arm64'
+          compression: none
+          enable-ssh: 1
+          wpa-country: CN
+          keyboard-keymap: us
+          stage-list: clean-stage stage0 stage1 stage2 stage3 stage4 stage4a
+          pi-gen-dir: pi-gen
+
+      - name: Upload pi-gen image
+        uses: actions/upload-artifact@v3
+        with:
+          name: reComuputer-R100x-64-image
+          path: ${{ steps.build.outputs.image-path }}

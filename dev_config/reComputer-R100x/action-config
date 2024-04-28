@@ -1,0 +1,7 @@
+image-name: 'Raspbian-reComputer-R100x-arm64'
+compression: none
+enable-ssh: 1
+wpa-country: CN
+keyboard-keymap: us
+stage-list: stage0 stage1 stage2 stage4a
+verbose-output: true
