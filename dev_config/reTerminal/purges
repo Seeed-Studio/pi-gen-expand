@@ -1,0 +1,5 @@
+python2.7
+cups cups-common cups-pk-helper cups-ppdc sane-utils
+pi-printer-support printer-driver-escpr system-config-printer
+geany
+thonny

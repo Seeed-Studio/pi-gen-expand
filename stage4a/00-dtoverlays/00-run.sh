@@ -1,13 +1,12 @@
 #!/bin/bash -e
 set -x
 
-SEEED_DEV_NAME=reComputer-R100x
+SEEED_DEV_NAME=${IMG_NAME}
 GIT_MODULE='https://github.com/Seeed-Studio/seeed-linux-dtoverlays.git -b master --depth=1'
 
 if [ "X$GIT_MODULE" != "X" ]; then
 	MODULE_PATH=/seeed-linux-dtoverlays
 	${PROXYCHAINS} git clone ${GIT_MODULE} "${ROOTFS_DIR}${MODULE_PATH}"
-	ls ${ROOTFS_DIR}${MODULE_PATH}
 	# ${PROXYCHAINS} wget http://192.168.1.77/reTerminalDM/dt-blob-disp1-cam2.bin -O "${ROOTFS_DIR}/boot/dt-blob.bin"
 
 	on_chroot << EOF
@@ -59,7 +58,7 @@ EOF
 fi
 
 
-if [ "${COPY_FILES}" = "1" ]; then
+if [ -d "files"]; then
 	log "Begin copy files special for seeed"
 	chmod +x ./files/dsi_fix.sh
 	cp ./files/dsi_fix.sh ${ROOTFS_DIR}/var/
@@ -69,12 +68,4 @@ systemctl daemon-reload
 systemctl enable seeed_dsifix.service
 EOF
 	log "End copy files special for seeed"
-fi
-
-if [ "${COPY_DOCKER_IMG}" = "1" ]; then
-	if [ -d $BASE_DIR/docker_images ]; then
-		cp -r $BASE_DIR/docker_images "${ROOTFS_DIR}/var/"
-	else
-		log "docker image files not exist,check your CI code!"
-	fi
 fi

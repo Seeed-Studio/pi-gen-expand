@@ -1,4 +1,4 @@
-name: Build pi-gen image
+name: Build reTerminal image
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ on:
       stage-list:
         description: 'List of stage name to execute in given order.'
         required: true
-        default: 'stage0 stage1 stage2 stage3 stage4'
+        default: 'stage0 stage1 stage2 stage3 stage4 stage4a'
         type: string
       wpa-country:
         description: 'Set the country code for WPA'
@@ -63,7 +63,7 @@ on:
           - false
 
 jobs:
-  pi-gen-image:
+  reTerminal-image:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -105,11 +105,17 @@ jobs:
           sudo -E apt-get -qq clean
           df -h
 
+      - name: Getting parameter configuration
+        run: |
+          cp -rf dev_config/reTerminal/* stage4a/00-dtoverlays/
+          chmod +x stage4a/prerun.sh
+          chmod +x stage4a/00-dtoverlays/*.sh
+
       - name: Build pi-gen with stagelists
         uses: usimd/pi-gen-action@v1
         id: build
         with:
-          image-name: 'pi-gen-${{ inputs.pi-gen-version }}'
+          image-name: 'reTerminal'
           pi-gen-version: ${{ inputs.pi-gen-version }}
           compression: ${{ inputs.compression }}
           enable-ssh: ${{ inputs.enable-ssh }}
@@ -120,8 +126,8 @@ jobs:
           export-last-stage-only: ${{ inputs.export-last-stage-only }}
           verbose-output: ${{ inputs.verbose-output }}
 
-      - name: Upload pi-gen image
+      - name: Upload reTerminal image
         uses: actions/upload-artifact@v3
         with:
-          name: Raspbian-${{ inputs.pi-gen-version }}
+          name: Raspbian-reTerminal-${{ inputs.pi-gen-version }}
           path: ${{ steps.build.outputs.image-path }}

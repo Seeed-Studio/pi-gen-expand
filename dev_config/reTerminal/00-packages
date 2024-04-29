@@ -1,0 +1,10 @@
+docker.io
+libfuse2
+libhidapi-hidraw0
+qrencode
+imagemagick
+can-utils
+python3-pip
+shotwell
+watchdog
+evtest
