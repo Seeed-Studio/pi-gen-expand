@@ -3,6 +3,15 @@ name: Build pi-gen image
 on:
   workflow_dispatch:
     inputs:
+      dev_name:
+        description: 'Name of device'
+        required: true
+        default: 'pi'
+        type: choice
+        options:
+          - pi
+          - reComputer-R100x
+          - reTerminal
       pi-gen-version:
         description: 'This can both be a branch or tag name known in the pi-gen repository.'
         required: true
@@ -19,7 +28,7 @@ on:
       stage-list:
         description: 'List of stage name to execute in given order.'
         required: true
-        default: 'stage0 stage1 stage2 stage3 stage4'
+        default: 'stage0 stage1 stage2 stage3 stage4 stage4a'
         type: string
       wpa-country:
         description: 'Set the country code for WPA'
@@ -66,7 +75,7 @@ jobs:
   pi-gen-image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: before Build
         run: |
           sudo apt-get remove aria2 ansible shellcheck rpm xorriso zsync \
@@ -105,11 +114,19 @@ jobs:
           sudo -E apt-get -qq clean
           df -h
 
-      - name: Build pi-gen with stagelists
+      - name: Getting parameter configuration
+        run: |
+          if [ -d "dev_config/${{ inputs.dev_name }}" ]; then
+            cp -rf dev_config/${{ inputs.dev_name }}/* stage4a/00-dtoverlays/
+          fi
+          chmod +x stage4a/prerun.sh
+          chmod +x stage4a/00-dtoverlays/*.sh
+
+      - name: Build ${{ inputs.dev_name }} with stagelists
         uses: usimd/pi-gen-action@v1
         id: build
         with:
-          image-name: 'pi-gen-${{ inputs.pi-gen-version }}'
+          image-name: ${{ inputs.dev_name }}
           pi-gen-version: ${{ inputs.pi-gen-version }}
           compression: ${{ inputs.compression }}
           enable-ssh: ${{ inputs.enable-ssh }}
@@ -120,8 +137,8 @@ jobs:
           export-last-stage-only: ${{ inputs.export-last-stage-only }}
           verbose-output: ${{ inputs.verbose-output }}
 
-      - name: Upload pi-gen image
-        uses: actions/upload-artifact@v3
+      - name: Upload ${{ inputs.dev_name }} image
+        uses: actions/upload-artifact@v4
         with:
-          name: Raspbian-${{ inputs.pi-gen-version }}
+          name: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}
           path: ${{ steps.build.outputs.image-path }}
