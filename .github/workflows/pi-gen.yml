@@ -50,18 +50,16 @@ on:
           - none
           - gz
           - zip
-      pi-gen-dir:
-        description: 'Path to the pi-gen directory'
+      username:
+        description: 'Username for the image'
         required: true
-        default: 'pi-gen'
-      export-last-stage-only:
-        description: 'Export only the last stage image'
+        default: 'pi'
+        type: string
+      password:
+        description: 'Password for the image'
         required: true
-        default: 'true'
-        type: choice
-        options:
-          - true
-          - false
+        default: 'raspberry'
+        type: string
       verbose-output:
         description: 'Enable verbose output'
         required: true
@@ -71,6 +69,10 @@ on:
           - true
           - false
 
+env:
+  EXPORT_LAST_STAGE_ONLY: true
+  PI_GEN_DIR: 'pi-gen'
+  
 jobs:
   pi-gen-image:
     runs-on: ubuntu-latest
@@ -133,9 +135,11 @@ jobs:
           wpa-country: ${{ inputs.wpa-country }}
           keyboard-keymap: ${{ inputs.keyboard-keymap }}
           stage-list: ${{ inputs.stage-list }}
-          pi-gen-dir: ${{ inputs.pi-gen-dir }}
-          export-last-stage-only: ${{ inputs.export-last-stage-only }}
+          pi-gen-dir: ${{ env.PI_GEN_DIR }}
+          export-last-stage-only: ${{ env.EXPORT_LAST_STAGE_ONLY }}
           verbose-output: ${{ inputs.verbose-output }}
+          username: ${{ inputs.username }}
+          password: ${{ inputs.password }}
 
       - name: Upload ${{ inputs.dev_name }} image
         uses: actions/upload-artifact@v4
