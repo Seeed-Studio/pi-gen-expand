@@ -1,7 +1,7 @@
 #!/bin/bash -e
 set -x
 
-if [[ ${IMG_NAME} == "pi" ]]; then
+if [[ ${IMG_NAME} == "raspberrypi" ]]; then
 	exit 0
 fi
 

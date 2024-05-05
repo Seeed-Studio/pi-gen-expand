@@ -9,7 +9,7 @@ on:
         default: 'pi'
         type: choice
         options:
-          - pi
+          - raspberrypi
           - reComputer-R100x
           - reTerminal
       pi-gen-version:
@@ -140,6 +140,7 @@ jobs:
           verbose-output: ${{ inputs.verbose-output }}
           username: ${{ inputs.username }}
           password: ${{ inputs.password }}
+          hostname: ${{ inputs.dev_name }}
 
       - name: Upload ${{ inputs.dev_name }} image
         uses: actions/upload-artifact@v4
