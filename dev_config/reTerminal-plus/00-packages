@@ -1,0 +1,15 @@
+dracut-core
+kpartx
+docker.io
+zstd
+libfuse2
+ostree
+jq
+libhidapi-hidraw0
+qrencode
+imagemagick
+can-utils
+python3-pip
+shotwell
+watchdog
+evtest

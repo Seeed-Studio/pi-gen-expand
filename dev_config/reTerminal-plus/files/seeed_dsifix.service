@@ -1,0 +1,13 @@
+[Unit]
+Description= fix dsi while lcd can't wakeup 
+After=lightdm.service
+
+[Service]
+Restart=on-failure
+RestartSec=1s
+User=root
+WorkingDirectory=/var
+ExecStart=/var/dsi_fix.sh
+
+[Install]
+WantedBy=multi-user.target

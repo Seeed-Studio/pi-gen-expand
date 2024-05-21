@@ -12,6 +12,7 @@ on:
           - raspberrypi
           - reComputer-R100x
           - reTerminal
+          - reTerminal-plus
       pi-gen-version:
         description: 'This can both be a branch or tag name known in the pi-gen repository.'
         required: true
@@ -40,16 +41,14 @@ on:
         required: true
         default: 'us'
         type: string
-      compression:
-        description: 'Compression method for the image'
+      disable-first-boot-user-rename:
+        description: 'Disable the renaming of the first user during the first boot.'
         required: true
-        default: 'xz'
+        default: "0"
         type: choice
         options:
-          - xz
-          - none
-          - gz
-          - zip
+          - 1
+          - 0
       username:
         description: 'Username for the image'
         required: true

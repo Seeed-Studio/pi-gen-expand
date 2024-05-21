@@ -1,0 +1,10 @@
+python2.7
+man-db manpages manpages-dev
+cups cups-common cups-pk-helper cups-ppdc sane-utils
+pi-printer-support printer-driver-escpr system-config-printer
+geany
+thonny
+needrestart
+binutils-aarch64-linux-gnu
+build-essential
+binutils-common
