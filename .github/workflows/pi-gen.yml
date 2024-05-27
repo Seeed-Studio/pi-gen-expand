@@ -129,8 +129,8 @@ jobs:
         with:
           image-name: ${{ inputs.dev_name }}
           pi-gen-version: ${{ inputs.pi-gen-version }}
-          compression: ${{ inputs.compression }}
           enable-ssh: ${{ inputs.enable-ssh }}
+          disable-first-boot-user-rename: ${{ inputs.disable-first-boot-user-rename }}
           wpa-country: ${{ inputs.wpa-country }}
           keyboard-keymap: ${{ inputs.keyboard-keymap }}
           stage-list: ${{ inputs.stage-list }}
@@ -142,7 +142,27 @@ jobs:
           hostname: ${{ inputs.dev_name }}
 
       - name: Upload ${{ inputs.dev_name }} image
+        id: artifact-upload-step
         uses: actions/upload-artifact@v4
         with:
           name: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}
           path: ${{ steps.build.outputs.image-path }}
+
+      - name: get Artifact download URL
+        run: |
+          echo "ARTIFACT_URL=${{ steps.artifact-upload-step.outputs.artifact-url }}" >> $GITHUB_ENV
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        
+      - name: update README.md
+        run: | 
+         echo "## ${{ steps.build.outputs.image-path }} image  ${{ inputs.dev_name }}-${{ inputs.pi-gen-version }} ${{ env.ARTIFACT_URL }}" 
+         python3 update_readme.py ${{ inputs.dev_name }}-${{ inputs.pi-gen-version }} ${{ inputs.username }} ${{ inputs.password }} ${{ inputs.enable-ssh }} "${{ inputs.stage-list }}" ${{ env.ARTIFACT_URL }}
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "GitHub Action"
+          git config --local user.email "action@github.com"
+          git commit -a -m 'update ${{ inputs.dev_name }}-${{ inputs.pi-gen-version }} URL'
+          git push 
