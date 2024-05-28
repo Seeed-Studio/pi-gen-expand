@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     # 尝试在表格中找到devname对应的行并更新
     for i, line in enumerate(lines):
-        if f"| {devname} " in line:
+        if f"| {devname}" in line:
             # 更新找到的行
             updated_line = line.split('|')
             updated_line[2] = f" {username_password.ljust(23)} "
