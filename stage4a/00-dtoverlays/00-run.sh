@@ -64,17 +64,15 @@ fi
 
 if [ -d "files" ]; then
 	log "Begin copy files special for seeed"
+	mkdir -p ${ROOTFS_DIR}/home/${FIRST_USER_NAME}/.config
 	if [ -f "./files/wayfire.ini" ]; then
-		mkdir -p ${ROOTFS_DIR}/home/${FIRST_USER_NAME}/.config
 		cp ./files/wayfire.ini ${ROOTFS_DIR}/home/${FIRST_USER_NAME}/.config
 	fi
 	chmod +x ./files/dsi_fix.sh
 	cp ./files/dsi_fix.sh ${ROOTFS_DIR}/var/
 	cp ./files/seeed_dsifix.service ${ROOTFS_DIR}/lib/systemd/system/
 	on_chroot << EOF
-if [ -f "/home/${FIRST_USER_NAME}/.config" ]; then
-	chown -vR ${FIRST_USER_NAME}:${FIRST_USER_NAME} /home/${FIRST_USER_NAME}/.config 
-fi
+chown -vR ${FIRST_USER_NAME}:${FIRST_USER_NAME} /home/${FIRST_USER_NAME}/.config 
 systemctl daemon-reload
 systemctl enable seeed_dsifix.service
 EOF
