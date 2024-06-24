@@ -78,3 +78,8 @@ systemctl enable seeed_dsifix.service
 EOF
 	log "End copy files special for seeed"
 fi
+
+if [ "${FIRST_USER_NAME}" != "root" ]; then
+	on_chroot << EOF
+chown -vR ${FIRST_USER_NAME}:${FIRST_USER_NAME} /home/${FIRST_USER_NAME}/.config
+EOF
