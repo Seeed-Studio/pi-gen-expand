@@ -1,0 +1,113 @@
+name: Build all images
+
+on:
+  create:
+    tags:
+        - '*'
+
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name'
+        required: true
+        default: 'v1.0.0'
+        type: string
+
+jobs:
+  Build-all-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check tag
+        id: check_tag
+        run: |
+          if [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
+           echo "TAG_NAME=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
+          elif [[ ${{ github.event_name }} == 'create' ]]; then
+           echo "TAG_NAME=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+
+      - name: Creat release
+        id: create_release
+        uses: actions/create-release@v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+         tag_name: ${{ env.TAG_NAME }}
+         draft: false
+
+      - name: build raspberrypi image
+        uses: benc-uk/workflow-dispatch@v1.1
+        with:
+          workflow: Build pi-gen image
+          token: ${{ secrets.GITHUB_TOKEN }}
+          inputs: >-
+                {
+                    "dev_name": "raspberrypi", 
+                    "pi-gen-version": "arm64", 
+                    "enable-ssh": "1", 
+                    "stage-list": "stage0 stage1 stage2 stage3 stage4", 
+                    "wpa-country" : "CN", 
+                    "keyboard-keymap": "us", 
+                    "disable-first-boot-user-rename": "0", 
+                    "username": "pi", 
+                    "password": "raspberry", 
+                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                }
+
+      - name: build reComputer-R100x image
+        uses: benc-uk/workflow-dispatch@v1.1
+        with:
+            workflow: Build pi-gen image
+            token: ${{ secrets.GITHUB_TOKEN }}
+            inputs: >-
+                {
+                    "dev_name": "reComputer-R100x", 
+                    "pi-gen-version": "arm64", 
+                    "enable-ssh": "1", 
+                    "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a", 
+                    "wpa-country" : "CN", 
+                    "keyboard-keymap": "us", 
+                    "disable-first-boot-user-rename": "1", 
+                    "username": "recomputer", 
+                    "password": "12345678", 
+                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                }
+
+      - name: build reTerminal image
+        uses: benc-uk/workflow-dispatch@v1.1
+        with:
+            workflow: Build pi-gen image
+            token: ${{ secrets.GITHUB_TOKEN }}
+            inputs: >-
+                {
+                    "dev_name": "reTerminal", 
+                    "pi-gen-version": "arm64", 
+                    "enable-ssh": "1", 
+                    "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a", 
+                    "wpa-country" : "CN", 
+                    "keyboard-keymap": "us", 
+                    "disable-first-boot-user-rename": "0", 
+                    "username": "pi", 
+                    "password": "raspberry", 
+                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                 }
+    
+      - name: build reTerminal-plus image
+        uses: benc-uk/workflow-dispatch@v1.1
+        with:
+            workflow: Build pi-gen image
+            token: ${{ secrets.GITHUB_TOKEN }}
+            inputs: >-
+                {
+                    "dev_name": "reTerminal-plus", 
+                    "pi-gen-version": "arm64", 
+                    "enable-ssh": "1", 
+                    "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a", 
+                    "wpa-country" : "CN", 
+                    "keyboard-keymap": "us", 
+                    "disable-first-boot-user-rename": "1", 
+                    "username": "pi", 
+                    "password": "raspberry", 
+                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                }
+    
