@@ -11,6 +11,7 @@ on:
         options:
           - raspberrypi
           - reComputer-R100x
+          - reComputer-R110x
           - reTerminal
           - reTerminal-plus
       pi-gen-version:
