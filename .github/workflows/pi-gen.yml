@@ -12,6 +12,7 @@ on:
           - raspberrypi
           - reComputer-R100x
           - reComputer-R110x
+          - reComputer-AI-box
           - reTerminal
           - reTerminal-plus
       pi-gen-version:
