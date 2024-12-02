@@ -130,14 +130,14 @@ jobs:
                     "release_url": "${{ steps.create_release.outputs.upload_url }}"
                  }
     
-      - name: build reTerminal-plus image
+      - name: build reTerminal-DM image
         uses: benc-uk/workflow-dispatch@v1.1
         with:
             workflow: Build pi-gen image
             token: ${{ secrets.GITHUB_TOKEN }}
             inputs: >-
                 {
-                    "dev_name": "reTerminal-plus", 
+                    "dev_name": "reTerminal-DM", 
                     "pi-gen-version": "arm64", 
                     "enable-ssh": "1", 
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a", 

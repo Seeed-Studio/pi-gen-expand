@@ -14,7 +14,7 @@ on:
           - reComputer-R110x
           - reComputer-AI-box
           - reTerminal
-          - reTerminal-plus
+          - reTerminal-DM
       pi-gen-version:
         description: 'This can both be a branch or tag name known in the pi-gen repository.'
         required: true
