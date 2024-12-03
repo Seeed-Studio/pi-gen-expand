@@ -121,12 +121,13 @@ jobs:
           chmod +x stage4a/prerun.sh
           chmod +x stage4a/00-dtoverlays/*.sh
 
-      - name: Determing whether to upload to release
+      - name: Determining whether to upload to release
         run: |
           if [ -n "${{ inputs.release_url }}" ]; then
             echo "UPLOAD_TO_RELEASE=true" >> $GITHUB_ENV
           else
             echo "UPLOAD_TO_RELEASE=false" >> $GITHUB_ENV
+            echo "VERBOSE_OUTPUT=true" >> $GITHUB_ENV
           fi
 
       - name: Build ${{ inputs.dev_name }} with stagelists
@@ -142,7 +143,7 @@ jobs:
           stage-list: ${{ inputs.stage-list }}
           pi-gen-dir: ${{ env.PI_GEN_DIR }}
           export-last-stage-only: ${{ env.EXPORT_LAST_STAGE_ONLY }}
-          verbose-output: ${{ env.UPLOAD_TO_RELEASE }}
+          verbose-output: ${{ env.VERBOSE_OUTPUT || 'false' }}
           username: ${{ inputs.username }}
           password: ${{ inputs.password }}
           hostname: ${{ inputs.dev_name }}
@@ -156,7 +157,7 @@ jobs:
 
       - name: Uploading ${{ inputs.dev_name }} image to release
         id: release-step
-        if: ${{ env.UPLOAD_TO_RELEASE }} == "true"
+        if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -166,8 +167,8 @@ jobs:
           asset_name: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}.zip
           asset_content_type: application/zip
 
-      - name: Get realease url
-        if: ${{ env.UPLOAD_TO_RELEASE }} == "true"
+      - name: Get release url
+        if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
         run: |
          echo "RELEASE_URL=${{ steps.release-step.outputs.browser_download_url }}" >> $GITHUB_ENV
 
@@ -175,7 +176,7 @@ jobs:
         uses: actions/setup-python@v2
         
       - name: update README.md
-        if: ${{ env.UPLOAD_TO_RELEASE }} == "true"
+        if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
         run: | 
          git config --local user.name "GitHub Action"
          git config --local user.email "action@github.com"
@@ -185,7 +186,7 @@ jobs:
          python3 update_readme.py ${{ inputs.dev_name }}-${{ inputs.pi-gen-version }} ${{ inputs.username }} ${{ inputs.password }} ${{ inputs.enable-ssh }} "${{ inputs.stage-list }}" ${{ env.RELEASE_URL }}
 
       - name: Commit and push changes
-        if: ${{ env.UPLOAD_TO_RELEASE }} == "true"
+        if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
         run: |
           git config --local user.name "GitHub Action"
           git config --local user.email "action@github.com"
