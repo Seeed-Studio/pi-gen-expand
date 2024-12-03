@@ -28,9 +28,13 @@ if [ -f "purges" ]; then
 	log "Begin ${SUB_STAGE_DIR}/purges"
 	PACKAGES="$(sed -f "${SCRIPT_DIR}/remove-comments.sed" < "purges")"
 	if [ -n "$PACKAGES" ]; then
-		on_chroot << EOF
-apt-get autoremove --purge -y $PACKAGES
+		set +e
+		for i in $PACKAGES; do
+			on_chroot << EOF
+apt-get autoremove --purge -y $i
 EOF
+		done
+		set -e
 		if [ "${USE_QCOW2}" = "1" ]; then
 			on_chroot << EOF
 apt-get clean
