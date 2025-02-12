@@ -13,6 +13,7 @@ on:
           - reComputer-R100x
           - reComputer-R110x
           - reComputer-AI-box
+          - reComputer-AI-box-cm5
           - reTerminal
           - reTerminal-DM
       pi-gen-version:
