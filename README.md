@@ -7,7 +7,7 @@ This project aims to automatically generate Raspberry Pi systems adapted for mul
 | Name                  |   username & password   | enable-ssh |                 stage-list                  |      date      |
 |-----------------------|-------------------------|------------|---------------------------------------------|----------------|
 | raspberrypi-arm64     | pi & raspberry          | 1          | stage0 stage1 stage2 stage3 stage4          | [2025-02-24](https://github.com/Seeed-Studio/pi-gen-expand/releases/download/v1.1.1/Raspbian-raspberrypi-arm64.zip)|
-| reTerminal-arm64      | pi & raspberry          | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2024-12-05](https://github.com/Seeed-Studio/pi-gen-expand/releases/download/v1.1.0/Raspbian-reTerminal-arm64.zip)|
+| reTerminal-arm64      | pi & raspberry          | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2025-02-24](https://github.com/Seeed-Studio/pi-gen-expand/releases/download/v1.1.1/Raspbian-reTerminal-arm64.zip)|
 | reComputer-R100x-arm64 | recomputer & 12345678   | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2025-02-24](https://github.com/Seeed-Studio/pi-gen-expand/releases/download/v1.1.1/Raspbian-reComputer-R100x-arm64.zip)|
 | reComputer-R110x-arm64 | recomputer & 12345678   | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2025-02-24](https://github.com/Seeed-Studio/pi-gen-expand/releases/download/v1.1.1/Raspbian-reComputer-R110x-arm64.zip)|
 | reComputer-AI-box-arm64 | recomputer & 12345678   | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2025-02-24](https://github.com/Seeed-Studio/pi-gen-expand/releases/download/v1.1.1/Raspbian-reComputer-AI-box-arm64.zip)|
