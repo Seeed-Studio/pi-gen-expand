@@ -1,0 +1,3 @@
+build-essential
+git
+raspberrypi-kernel-headers

@@ -88,3 +88,14 @@ if [ "${FIRST_USER_NAME}" != "root" ]; then
 chown -vR ${FIRST_USER_NAME}:${FIRST_USER_NAME} /home/${FIRST_USER_NAME}/.config
 EOF
 fi
+
+if [ -f "postrun.sh" ]; then
+    log "Begin ${SUB_STAGE_DIR}/postrun.sh"
+    cp ./postrun.sh ${ROOTFS_DIR}/tmp/postrun.sh
+    on_chroot << EOF
+cd /tmp
+chmod +x postrun.sh
+sudo ./postrun.sh
+rm -fv postrun.sh
+EOF
+fi
