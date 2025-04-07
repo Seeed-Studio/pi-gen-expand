@@ -1,3 +1,4 @@
 build-essential
 git
 raspberrypi-kernel-headers
+hailo-all
