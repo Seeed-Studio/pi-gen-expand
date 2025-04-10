@@ -39,7 +39,7 @@ function get_kernel_version() {
 
 kernelver=$(get_kernel_version)
 
-git clone https://github.com/hailo-ai/hailort-drivers.git
+git clone https://github.com/hailo-ai/hailort-drivers.git -b v4.20.0
 cd hailort-drivers/linux/pcie
 
 make all kernelver=$kernelver
@@ -61,9 +61,11 @@ cp ./linux/pcie/51-hailo-udev.rules /etc/udev/rules.d/
 rm -rf hailort-drivers
 
 # install examples
-cd ~/
-git clone https://github.com/hailo-ai/hailo-rpi5-examples.git
-cd hailo-rpi5-examples
+sudo -u ${FIRST_USER_NAME} bash -c '
+  cd ~/
+  git clone https://github.com/hailo-ai/hailo-rpi5-examples.git
+  cd hailo-rpi5-examples
 
-sed -i 's/device_arch=.*$/device_arch=HAILO8/g' setup_env.sh
-./install.sh
+  sed -i 's/device_arch=.*$/device_arch=HAILO8/g' setup_env.sh
+  ./install.sh
+'
