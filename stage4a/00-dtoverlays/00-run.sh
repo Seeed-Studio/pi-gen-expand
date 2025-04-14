@@ -95,7 +95,7 @@ if [ -f "postrun.sh" ]; then
     on_chroot << EOF
 cd /tmp
 chmod +x postrun.sh
-sudo ./postrun.sh
+./postrun.sh
 rm -fv postrun.sh
 EOF
 fi
