@@ -1,0 +1,10 @@
+[Unit]
+Description=R21 Board Detect Service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/r21_board_detect.sh
+RemainAfterExit=no
+
+[Install]
+WantedBy=sysinit.target

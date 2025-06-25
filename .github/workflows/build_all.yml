@@ -92,6 +92,25 @@ jobs:
                     "release_url": "${{ steps.create_release.outputs.upload_url }}"
                 }
 
+      - name: build reComputer-R2x image
+        uses: benc-uk/workflow-dispatch@v1.1
+        with:
+            workflow: Build pi-gen image
+            token: ${{ secrets.GITHUB_TOKEN }}
+            inputs: >-
+                {
+                    "dev_name": "reComputer-R2x",
+                    "pi-gen-version": "arm64",
+                    "enable-ssh": "1",
+                    "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a",
+                    "wpa-country" : "CN",
+                    "keyboard-keymap": "us",
+                    "disable-first-boot-user-rename": "1",
+                    "username": "recomputer",
+                    "password": "12345678",
+                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                }
+
       - name: build reComputer-AI-box image
         uses: benc-uk/workflow-dispatch@v1.1
         with:
