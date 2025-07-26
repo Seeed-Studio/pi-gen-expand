@@ -85,6 +85,9 @@ jobs:
           free -h
           
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: before Build
         run: |
           sudo apt-get remove aria2 ansible shellcheck rpm xorriso zsync \
@@ -144,6 +147,8 @@ jobs:
         uses: usimd/pi-gen-action@v1
         id: build
         with:
+          compression: xz
+          compression-level: 9
           image-name: ${{ inputs.dev_name }}
           pi-gen-version: ${{ inputs.pi-gen-version }}
           enable-ssh: ${{ inputs.enable-ssh }}
@@ -165,10 +170,6 @@ jobs:
           name: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}
           path: ${{ steps.build.outputs.image-path }}
 
-      - name: Compress image using xz
-        run: |
-          tar -cvJf ${{ steps.build.outputs.image-path }}.tar.xz ${{ steps.build.outputs.image-path }}
-
       - name: Uploading ${{ inputs.dev_name }} image to release
         id: release-step
         if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
@@ -177,8 +178,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ inputs.release_url }}
-          asset_path: ${{ steps.build.outputs.image-path }}.tar.xz
-          asset_name: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}.zip.tar.xz
+          asset_path: ${{ steps.build.outputs.image-path }}
+          asset_name: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}.tar.xz
           asset_content_type: application/x-tar
 
       - name: Get release url
@@ -188,15 +189,17 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v2
-        
+
       - name: update README.md
         if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
         run: | 
          git config --local user.name "GitHub Action"
          git config --local user.email "action@github.com"
-         git checkout main
+         if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+           git checkout main
+         fi
          git pull
-         echo "## ${{ steps.build.outputs.image-path }} image  ${{ inputs.dev_name }}-${{ inputs.pi-gen-version }} ${{ env.RELEASE_URL }}" 
+         echo "## ${{ steps.build.outputs.image-path }} image  ${{ inputs.dev_name }}-${{ inputs.pi-gen-version }} ${{ env.RELEASE_URL }}"
          python3 update_readme.py ${{ inputs.dev_name }}-${{ inputs.pi-gen-version }} ${{ inputs.username }} ${{ inputs.password }} ${{ inputs.enable-ssh }} "${{ inputs.stage-list }}" ${{ env.RELEASE_URL }}
 
       - name: Commit and push changes
@@ -204,5 +207,5 @@ jobs:
         run: |
           git config --local user.name "GitHub Action"
           git config --local user.email "action@github.com"
-          git commit -a -m 'update ${{ inputs.dev_name }}-${{ inputs.pi-gen-version }} URL'
-          git push 
+          git commit -a -m 'docs: update ${{ inputs.dev_name }}-${{ inputs.pi-gen-version }} URL'
+          git push
