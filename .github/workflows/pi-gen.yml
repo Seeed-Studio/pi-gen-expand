@@ -13,6 +13,7 @@ on:
           - reComputer-R100x
           - reComputer-R110x
           - reComputer-R2x
+          - reComputer-R22
           - reComputer-AI-box
           - reComputer-AI-box-cm5
           - reTerminal
