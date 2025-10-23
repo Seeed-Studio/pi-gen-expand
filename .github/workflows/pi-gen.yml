@@ -145,6 +145,14 @@ jobs:
             echo "VERBOSE_OUTPUT=true" >> $GITHUB_ENV
           fi
 
+      - name: Extract release codename
+        id: extract_release
+        run: |
+          VER='${{ inputs.pi-gen-version }}'
+          REL="${VER%%-*}"
+          echo "release=$REL" >> "$GITHUB_OUTPUT"
+          echo "Detected release codename: $REL"
+
       - name: Build ${{ inputs.dev_name }} with stagelists
         uses: usimd/pi-gen-action@v1
         id: build
@@ -165,6 +173,7 @@ jobs:
           password: ${{ inputs.password }}
           hostname: ${{ inputs.dev_name }}
           increase-runner-disk-size: true
+          release: ${{ steps.extract_release.outputs.release }}
 
       - name: Upload ${{ inputs.dev_name }} image
         id: artifact-upload-step
