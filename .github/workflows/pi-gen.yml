@@ -150,6 +150,9 @@ jobs:
         run: |
           VER='${{ inputs.pi-gen-version }}'
           REL="${VER%%-*}"
+          if [[ "$REL" == *arm* ]]; then
+            REL=""
+          fi
           echo "release=$REL" >> "$GITHUB_OUTPUT"
           echo "Detected release codename: $REL"
 
