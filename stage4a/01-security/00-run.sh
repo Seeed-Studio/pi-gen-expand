@@ -23,3 +23,9 @@ for file in /etc/apt/sources.list.d/*.list ; do
 	sed -i 's|http://|[signed-by=/usr/share/keyrings/rpi-archive-keyring.gpg] https://|g' "\$file"
 done
 EOF
+
+# After booting, you need to log in to enter the desktop.
+on_chroot << EOF
+set -x
+raspi-config nonint do_boot_behaviour B2
+EOF
