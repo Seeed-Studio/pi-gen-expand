@@ -67,7 +67,7 @@ jobs:
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a", 
                     "wpa-country" : "CN", 
                     "keyboard-keymap": "us", 
-                    "disable-first-boot-user-rename": "1", 
+                    "disable-first-boot-user-rename": "0", 
                     "username": "recomputer", 
                     "password": "12345678", 
                     "release_url": "${{ steps.create_release.outputs.upload_url }}"
@@ -86,7 +86,7 @@ jobs:
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a", 
                     "wpa-country" : "CN", 
                     "keyboard-keymap": "us", 
-                    "disable-first-boot-user-rename": "1", 
+                    "disable-first-boot-user-rename": "0", 
                     "username": "recomputer", 
                     "password": "12345678", 
                     "release_url": "${{ steps.create_release.outputs.upload_url }}"
@@ -105,7 +105,7 @@ jobs:
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a",
                     "wpa-country" : "CN",
                     "keyboard-keymap": "us",
-                    "disable-first-boot-user-rename": "1",
+                    "disable-first-boot-user-rename": "0",
                     "username": "recomputer",
                     "password": "12345678",
                     "release_url": "${{ steps.create_release.outputs.upload_url }}"
@@ -124,7 +124,7 @@ jobs:
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a",
                     "wpa-country" : "CN",
                     "keyboard-keymap": "us",
-                    "disable-first-boot-user-rename": "1",
+                    "disable-first-boot-user-rename": "0",
                     "username": "recomputer",
                     "password": "12345678",
                     "release_url": "${{ steps.create_release.outputs.upload_url }}"
@@ -143,7 +143,7 @@ jobs:
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a", 
                     "wpa-country" : "CN", 
                     "keyboard-keymap": "us", 
-                    "disable-first-boot-user-rename": "1", 
+                    "disable-first-boot-user-rename": "0", 
                     "username": "recomputer", 
                     "password": "12345678", 
                     "release_url": "${{ steps.create_release.outputs.upload_url }}"
@@ -162,7 +162,7 @@ jobs:
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a", 
                     "wpa-country" : "CN", 
                     "keyboard-keymap": "us", 
-                    "disable-first-boot-user-rename": "1", 
+                    "disable-first-boot-user-rename": "0", 
                     "username": "recomputer", 
                     "password": "12345678", 
                     "release_url": "${{ steps.create_release.outputs.upload_url }}"
@@ -200,7 +200,7 @@ jobs:
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a", 
                     "wpa-country" : "CN", 
                     "keyboard-keymap": "us", 
-                    "disable-first-boot-user-rename": "1", 
+                    "disable-first-boot-user-rename": "0", 
                     "username": "pi", 
                     "password": "raspberry", 
                     "release_url": "${{ steps.create_release.outputs.upload_url }}"
