@@ -15,4 +15,5 @@ This project aims to automatically generate Raspberry Pi systems adapted for mul
 | reComputer-AI-box-cm5-arm64 | recomputer & 12345678   | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2025-08-19](https://github.com/Seeed-Studio/pi-gen-expand/releases/download/v1.1.4/Raspbian-reComputer-AI-box-cm5-arm64.tar.xz)|
 | reComputer-R2x-arm64  | recomputer & 12345678   | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2025-08-19](https://github.com/Seeed-Studio/pi-gen-expand/releases/download/v1.1.4/Raspbian-reComputer-R2x-arm64.tar.xz)|
 | reComputer-AI-box-cm5-bookworm-arm64 | recomputer & 12345678   | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2025-11-05](https://seeedstudio88-my.sharepoint.com/personal/baozhu_zuo_seeedstudio88_onmicrosoft_com/_layouts/15/download.aspx?share=EZS_yFIp9jdJu2QLFH8TMj8B6RqJVyk7aGsXIMOs1RR9gQ)|
+| reComputer-R2x-bookworm-arm64 | recomputer & 12345678   | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2025-11-05](https://seeedstudio88-my.sharepoint.com/personal/baozhu_zuo_seeedstudio88_onmicrosoft_com/_layouts/15/download.aspx?share=EbaEf6WI6a5KicBNrsZWwCABrhh94JyXgzEad8NIXR3Xjw) |
 
