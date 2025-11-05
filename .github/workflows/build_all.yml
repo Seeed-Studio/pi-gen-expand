@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag name'
+        description: 'release name'
         required: true
         default: 'v1.0.0'
         type: string
@@ -51,7 +51,7 @@ jobs:
                     "disable-first-boot-user-rename": "0", 
                     "username": "pi", 
                     "password": "raspberry", 
-                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                    "release_name": "${{ env.TAG_NAME }}"
                 }
 
       - name: build reComputer-R100x image
@@ -70,7 +70,7 @@ jobs:
                     "disable-first-boot-user-rename": "0", 
                     "username": "recomputer", 
                     "password": "12345678", 
-                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                    "release_name": "${{ env.TAG_NAME }}"
                 }
 
       - name: build reComputer-R110x image
@@ -89,7 +89,7 @@ jobs:
                     "disable-first-boot-user-rename": "0", 
                     "username": "recomputer", 
                     "password": "12345678", 
-                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                    "release_name": "${{ env.TAG_NAME }}"
                 }
 
       - name: build reComputer-R2x image
@@ -108,7 +108,7 @@ jobs:
                     "disable-first-boot-user-rename": "0",
                     "username": "recomputer",
                     "password": "12345678",
-                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                    "release_name": "${{ env.TAG_NAME }}"
                 }
 
       - name: build reComputer-R22 image
@@ -127,7 +127,7 @@ jobs:
                     "disable-first-boot-user-rename": "0",
                     "username": "recomputer",
                     "password": "12345678",
-                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                    "release_name": "${{ env.TAG_NAME }}"
                 }
 
       - name: build reComputer-AI-box image
@@ -146,7 +146,7 @@ jobs:
                     "disable-first-boot-user-rename": "0", 
                     "username": "recomputer", 
                     "password": "12345678", 
-                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                    "release_name": "${{ env.TAG_NAME }}"
                 }
 
       - name: build reComputer-AI-box image
@@ -165,7 +165,7 @@ jobs:
                     "disable-first-boot-user-rename": "0", 
                     "username": "recomputer", 
                     "password": "12345678", 
-                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                    "release_name": "${{ env.TAG_NAME }}"
                 }
                                               
       - name: build reTerminal image
@@ -184,7 +184,7 @@ jobs:
                     "disable-first-boot-user-rename": "0", 
                     "username": "pi", 
                     "password": "raspberry", 
-                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                    "release_name": "${{ env.TAG_NAME }}"
                  }
     
       - name: build reTerminal-DM image
@@ -203,6 +203,6 @@ jobs:
                     "disable-first-boot-user-rename": "0", 
                     "username": "pi", 
                     "password": "raspberry", 
-                    "release_url": "${{ steps.create_release.outputs.upload_url }}"
+                    "release_name": "${{ env.TAG_NAME }}"
                 }
     
