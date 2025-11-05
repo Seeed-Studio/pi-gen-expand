@@ -200,8 +200,24 @@ jobs:
           RCLONE_SHARE_URL=$(rclone link seeed-storage:pi-gen-images/${{ steps.upload_remote.outputs.remote_file }})
           echo "RCLONE_SHARE_URL=$RCLONE_SHARE_URL" >> $GITHUB_ENV
 
-      - name: Setup Python
-        uses: actions/setup-python@v2
+      - name: create file ${{ inputs.dev_name }}-info.txt
+        if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
+        run: |
+          echo "Image: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}-${{ env.TAG_NAME }}.tar.xz" > ${{ inputs.dev_name }}-info.txt
+          echo "Download URL: ${{ env.RCLONE_SHARE_URL }}" >> ${{ inputs.dev_name }}-info.txt
+          echo "Username: ${{ inputs.username }}" >> ${{ inputs.dev_name }}-info.txt
+          echo "Password: ${{ inputs.password }}" >> ${{ inputs.dev_name }}-info.txt
+          echo "Enable SSH: ${{ inputs.enable-ssh }}" >> ${{ inputs.dev_name }}-info.txt
+          echo "Stage List: ${{ inputs.stage-list }}" >> ${{ inputs.dev_name }}-info.txt
+          echo "size: $(du -h ${{ steps.build.outputs.image-path }} | awk '{print $1}')" >> ${{ inputs.dev_name }}-info.txt
+
+      - name: Uploading ${{ inputs.dev_name }}-info.txt to release
+        if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ inputs.release_name }}" ${{ inputs.dev_name }}-info.txt --clobber --repo ${{ github.repository }}
 
       - name: update README.md
         if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
