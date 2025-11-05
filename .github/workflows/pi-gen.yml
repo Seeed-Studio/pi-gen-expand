@@ -185,11 +185,18 @@ jobs:
           name: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}
           path: ${{ steps.build.outputs.image-path }}
 
+      - name: Setup Rclone
+        if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
+        uses: AnimMouse/setup-rclone@v1
+        with:
+          version: v1.67.0
+          rclone_config: ${{ secrets.RCLONE_CONFIG }}
+
       - name: Upload ${{ inputs.dev_name }} image to remote storage
         if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
         id: upload_remote
         run: |
-          REMOTE_FILE="Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}-${{ env.TAG_NAME }}.tar.xz"
+          REMOTE_FILE="Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}-${{ inputs.release_name }}.tar.xz"
           echo "remote_file=$REMOTE_FILE" >> $GITHUB_OUTPUT
           rclone copyto -P --stats 1m ${{ steps.build.outputs.image-path }} \
           seeed-storage:pi-gen-images/$REMOTE_FILE
@@ -227,7 +234,7 @@ jobs:
       - name: create file ${{ inputs.dev_name }}-info.txt
         if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
         run: |
-          echo "Image: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}-${{ env.TAG_NAME }}.tar.xz" > ${{ inputs.dev_name }}-info.txt
+          echo "Image: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}-${{ inputs.release_name }}.tar.xz" > ${{ inputs.dev_name }}-info.txt
           echo "Download URL: ${{ env.RCLONE_SHARE_URL }}" >> ${{ inputs.dev_name }}-info.txt
           echo "Username: ${{ inputs.username }}" >> ${{ inputs.dev_name }}-info.txt
           echo "Password: ${{ inputs.password }}" >> ${{ inputs.dev_name }}-info.txt
