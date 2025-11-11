@@ -194,6 +194,30 @@ jobs:
           rclone copyto -P --stats 1m ${{ steps.build.outputs.image-path }} \
           seeed-storage:pi-gen-images/$REMOTE_FILE
 
+      - name: Clean up old images
+        if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+          DEVICE_NAME="${{ inputs.dev_name }}"
+          REMOTE_PATH="seeed-storage:pi-gen-images"
+          
+          # List files, filter by device, sort by date, and get the list of files to delete
+          files_to_delete=$(rclone lsjson "$REMOTE_PATH" | \
+            jq -r --arg devname "$DEVICE_NAME" '.[] | select(.Name | test("Raspbian-\($devname)-")) | .Name' | \
+            sort -r | \
+            tail -n +4)
+          
+          if [ -n "$files_to_delete" ]; then
+            echo "Found old images to delete:"
+            echo "$files_to_delete"
+            echo "$files_to_delete" | while read -r file; do
+              echo "Deleting $REMOTE_PATH/$file"
+              rclone deletefile "$REMOTE_PATH/$file"
+            done
+          else
+            echo "No old images to delete."
+          fi
+
       - name: Get rclone share link
         if: ${{ env.UPLOAD_TO_RELEASE == 'true' }}
         run: |
