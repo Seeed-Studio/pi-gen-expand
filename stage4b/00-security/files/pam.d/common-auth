@@ -12,11 +12,11 @@
 # local modules either before or after the default block, and use
 # pam-auth-update to manage selection of other modules.  See
 # pam-auth-update(8) for details.
-auth    required                        pam_faillock.so preauth silent audit deny=5 unlock_time=300 fail_interval=900 fail_msg="yyyyy fail"
+auth    required                        pam_faillock.so preauth silent audit deny=5 unlock_time=300 fail_interval=900
 # here are the per-package modules (the "Primary" block)
 auth    [success=1 default=bad] pam_unix.so
 # here's the fallback if no module succeeds
-auth    [default=die]                   pam_faillock.so authfail audit deny=5 unlock_time=300 fail_interval=900 fail_msg="tttttt fail"
+auth    [default=die]                   pam_faillock.so authfail audit deny=5 unlock_time=300 fail_interval=900
 auth    sufficient                      pam_faillock.so authsucc audit deny=5 unlock_time=300 fail_interval=900
 auth    requisite                       pam_deny.so
 # prime the stack with a positive return value if there isn't one already;
