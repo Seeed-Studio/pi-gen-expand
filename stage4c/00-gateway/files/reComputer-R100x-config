@@ -1,0 +1,36 @@
+# LXC container configuration for Recomputer R100x running OpenWrt
+lxc.start.auto = 1
+
+# Distribution configuration
+lxc.include = /usr/share/lxc/config/common.conf
+lxc.arch = aarch64
+
+# Container specific configuration
+lxc.apparmor.profile = unconfined
+lxc.apparmor.allow_nesting = 1
+lxc.rootfs.path = dir:/var/lib/lxc/openwrt/rootfs
+lxc.uts.name = openwrt
+
+# Network configuration
+lxc.net.0.type = phys
+lxc.net.0.link = eth0
+lxc.net.0.flags = up
+lxc.net.0.name = eth0
+
+lxc.mount.auto = sys:rw
+
+lxc.cgroup2.devices.allow = c 89:* rwm
+lxc.cgroup2.devices.allow = c 254:* rwm
+lxc.cgroup2.devices.allow = c 153:* rwm
+lxc.cgroup2.devices.allow = c 188:* rwm
+lxc.cgroup2.devices.allow = c 204:* rwm
+lxc.mount.entry = /dev/i2c-6 dev/i2c-1 none bind,optional,create=file
+lxc.mount.entry = /dev/spidev1.1 dev/spidev0.1 none bind,optional,create=file
+lxc.mount.entry = /dev/gpiochip2 dev/gpiochip2 none bind,optional,create=file
+lxc.mount.entry = /dev/ttyAMA2 dev/ttyAMA2 none bind,optional,create=file
+lxc.mount.entry = /dev/ttyAMA3 dev/ttyAMA3 none bind,optional,create=file
+lxc.mount.entry = /dev/ttyAMA4 dev/ttyAMA4 none bind,optional,create=file
+lxc.mount.entry = /dev/ttyUSB0 dev/ttyUSB0 none bind,optional,create=file
+lxc.mount.entry = /dev/ttyUSB1 dev/ttyUSB1 none bind,optional,create=file
+lxc.mount.entry = /dev/ttyUSB2 dev/ttyUSB2 none bind,optional,create=file
+lxc.mount.entry = /dev/ttyUSB3 dev/ttyUSB3 none bind,optional,create=file
