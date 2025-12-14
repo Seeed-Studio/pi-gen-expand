@@ -16,7 +16,7 @@ wget https://github.com/is-qian/recomputer-gateway/releases/latest/download/open
 
 # Create LXC container
 mkdir -p /var/lib/lxc/openwrt/rootfs
-tar -xzf /tmp/openwrt-rootfs.tar.gz -C /var/lib/lxc/openwrt/rootfs
+tar --transform 's|^/||' --warning=no-file-ignored -xzf /tmp/openwrt-rootfs.tar.gz -C /var/lib/lxc/openwrt/rootfs || true
 
 # Create config file if not exists
 if [ ! -f /var/lib/lxc/openwrt/config ]; then
