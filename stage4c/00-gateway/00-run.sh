@@ -2,9 +2,10 @@
 set -x
 
 SEEED_DEV_NAME=${IMG_NAME}
-if [ -d "files/$SEEED_DEV_NAME-config" ]; then
+if [ -f "files/$SEEED_DEV_NAME-config" ]; then
     log "Begin copy files for seeed $SEEED_DEV_NAME"
-    cp -r ./files/$SEEED_DEV_NAME-config/* ${ROOTFS_DIR}/var/lib/lxc/openwrt/config
+    mkdir -p ${ROOTFS_DIR}/var/lib/lxc/openwrt
+    cp ./files/$SEEED_DEV_NAME-config ${ROOTFS_DIR}/var/lib/lxc/openwrt/config
 fi
 
 # For security authentication, change http in apt source to https
