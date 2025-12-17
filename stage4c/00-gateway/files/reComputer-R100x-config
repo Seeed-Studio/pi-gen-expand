@@ -34,3 +34,6 @@ lxc.mount.entry = /dev/ttyUSB0 dev/ttyUSB0 none bind,optional,create=file
 lxc.mount.entry = /dev/ttyUSB1 dev/ttyUSB1 none bind,optional,create=file
 lxc.mount.entry = /dev/ttyUSB2 dev/ttyUSB2 none bind,optional,create=file
 lxc.mount.entry = /dev/ttyUSB3 dev/ttyUSB3 none bind,optional,create=file
+
+lxc.cgroup2.devices.allow = c 180:* rwm
+lxc.mount.entry = /dev/cdc-wdm0 dev/cdc-wdm0 none bind,optional,create=file
