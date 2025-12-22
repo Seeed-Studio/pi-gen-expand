@@ -4,8 +4,8 @@ set -x
 SEEED_DEV_NAME=${IMG_NAME}
 if [ -f "files/$SEEED_DEV_NAME-config" ]; then
     log "Begin copy files for seeed $SEEED_DEV_NAME"
-    mkdir -p ${ROOTFS_DIR}/var/lib/lxc/openwrt
-    cp ./files/$SEEED_DEV_NAME-config ${ROOTFS_DIR}/var/lib/lxc/openwrt/config
+    mkdir -p ${ROOTFS_DIR}/var/lib/lxc/SenseCAP
+    cp ./files/$SEEED_DEV_NAME-config ${ROOTFS_DIR}/var/lib/lxc/SenseCAP/config
 fi
 
 # For security authentication, change http in apt source to https
@@ -16,23 +16,23 @@ wget https://github.com/is-qian/recomputer-gateway/releases/latest/download/open
  -O /tmp/openwrt-rootfs.tar.gz
 
 # Create LXC container
-mkdir -p /var/lib/lxc/openwrt/rootfs
-tar --transform 's|^/||' --warning=no-file-ignored -xzf /tmp/openwrt-rootfs.tar.gz -C /var/lib/lxc/openwrt/rootfs || true
+mkdir -p /var/lib/lxc/SenseCAP/rootfs
+tar --transform 's|^/||' --warning=no-file-ignored -xzf /tmp/openwrt-rootfs.tar.gz -C /var/lib/lxc/SenseCAP/rootfs || true
 
 # Create config file if not exists
-if [ ! -f /var/lib/lxc/openwrt/config ]; then
-    echo "lxc.rootfs.path = dir:/var/lib/lxc/openwrt/rootfs" > /var/lib/lxc/openwrt/config
-    echo "lxc.uts.name = openwrt" >> /var/lib/lxc/openwrt/config
+if [ ! -f /var/lib/lxc/SenseCAP/config ]; then
+    echo "lxc.rootfs.path = dir:/var/lib/lxc/SenseCAP/rootfs" > /var/lib/lxc/SenseCAP/config
+    echo "lxc.uts.name = SenseCAP" >> /var/lib/lxc/SenseCAP/config
 fi
 
 # Set LXC to auto-start
-if ! grep -q "lxc.start.auto" /var/lib/lxc/openwrt/config; then
-    echo "lxc.start.auto = 1" >> /var/lib/lxc/openwrt/config
+if ! grep -q "lxc.start.auto" /var/lib/lxc/SenseCAP/config; then
+    echo "lxc.start.auto = 1" >> /var/lib/lxc/SenseCAP/config
 fi
 
 # Fix Read-only file system error for GPIO
-if ! grep -q "lxc.mount.auto = sys:rw" /var/lib/lxc/openwrt/config; then
-    echo "lxc.mount.auto = sys:rw" >> /var/lib/lxc/openwrt/config
+if ! grep -q "lxc.mount.auto = sys:rw" /var/lib/lxc/SenseCAP/config; then
+    echo "lxc.mount.auto = sys:rw" >> /var/lib/lxc/SenseCAP/config
 fi
 
 # Clean up

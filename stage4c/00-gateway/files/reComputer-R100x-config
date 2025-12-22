@@ -1,4 +1,4 @@
-# LXC container configuration for Recomputer R100x running OpenWrt
+# LXC container configuration for Recomputer R100x running SenseCAP
 lxc.start.auto = 1
 
 # Distribution configuration
@@ -8,8 +8,8 @@ lxc.arch = aarch64
 # Container specific configuration
 lxc.apparmor.profile = unconfined
 lxc.apparmor.allow_nesting = 1
-lxc.rootfs.path = dir:/var/lib/lxc/openwrt/rootfs
-lxc.uts.name = openwrt
+lxc.rootfs.path = dir:/var/lib/lxc/SenseCAP/rootfs
+lxc.uts.name = SenseCAP
 
 # Network configuration
 lxc.net.0.type = phys
