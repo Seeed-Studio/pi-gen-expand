@@ -103,6 +103,8 @@ DEBIAN_NUM=$(echo "$DEBIAN_VER" | awk -F'.' '{print $1}')
 _VER_RUN=""
 function get_kernel_version() {
   local ZIMAGE IMG_OFFSET
+  # Get installed kernel version from config.txt or detect from available kernels
+  local uname_r=$(ls /boot/firmware/kernel*.img 2>/dev/null | grep -o 'kernel[^.]*' | head -1)
 
   if [ -z "$_VER_RUN" ]; then
     if [ $DEBIAN_NUM -lt $BOOKWORM_NUM ]; then
@@ -131,14 +133,44 @@ function get_kernel_version() {
   return 0
 }
 
-kernelver=$(get_kernel_version)
-
 VERSION="${HAILO_VERSION:-$(apt list hailo-all 2>/dev/null | grep hailo-all | awk '{print $2}' | cut -d' ' -f1)}"
 echo "Hailo version: $VERSION"
 git clone https://github.com/hailo-ai/hailort-drivers.git -b v$VERSION hailort-drivers
 cd hailort-drivers/linux/pcie
 
-make all kernelver=$kernelver
+# Compile and install driver for ALL kernel versions
+echo "Processing all kernel versions..."
+for kver_dir in /lib/modules/6.12.47+rpt-rpi*/; do
+    kver=$(basename "$kver_dir")
+    echo "=== Processing kernel $kver ==="
+    
+    # Compile driver for this specific kernel using correct kernel headers
+    echo "  Compiling driver for $kver"
+    make clean >/dev/null 2>&1 || true
+    make all KERNEL_DIR=/lib/modules/$kver/build
+    
+    # Install compiled driver
+    echo "  Installing to /lib/modules/$kver/kernel/drivers/misc/"
+    mkdir -p /lib/modules/$kver/kernel/drivers/misc
+    cp hailo_pci.ko /lib/modules/$kver/kernel/drivers/misc/
+    
+    # Remove kernel built-in hailo driver (4.20.0)
+    if [ -d "/lib/modules/$kver/kernel/drivers/media/pci/hailo" ]; then
+        echo "  Removing old driver from $kver"
+        find /lib/modules/$kver/kernel/drivers/media/pci/hailo -name "hailo_pci.ko*" -delete 2>/dev/null || true
+    fi
+    
+    echo "  Completed $kver"
+done
+echo "All kernel versions processed"
+
+# Update module dependencies for all kernel versions
+echo "Updating module dependencies..."
+for kver_dir in /lib/modules/6.12.47+rpt-rpi*/; do
+    kver=$(basename "$kver_dir")
+    depmod -a "$kver" 2>/dev/null || true
+done
+echo "Module dependencies updated"
 
 cd ../..
 
