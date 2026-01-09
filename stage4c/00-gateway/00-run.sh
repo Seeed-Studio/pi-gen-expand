@@ -12,7 +12,7 @@ fi
 on_chroot << EOF
 set -x
 # Download LXC image from GitHub
-wget https://github.com/is-qian/recomputer-gateway/releases/latest/download/openwrt-armsr-armv8-generic-rootfs.tar.gz \
+wget https://github.com/Seeed-Studio/sensecap-openwrt-feed/releases/latest/download/openwrt-armsr-armv8-generic-rootfs.tar.gz \
  -O /tmp/openwrt-rootfs.tar.gz
 
 # Create LXC container
