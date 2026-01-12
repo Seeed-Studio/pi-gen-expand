@@ -19,8 +19,6 @@ lxc.net.0.name = eth0
 # Allow access to network devices
 lxc.cgroup2.devices.allow = c 10:* rwm
 
-lxc.mount.auto = sys:rw
-
 lxc.cgroup2.devices.allow = c 89:* rwm
 lxc.cgroup2.devices.allow = c 254:* rwm
 lxc.cgroup2.devices.allow = c 153:* rwm
@@ -32,11 +30,9 @@ lxc.mount.entry = /dev/gpiochip2 dev/gpiochip2 none bind,optional,create=file
 lxc.mount.entry = /dev/ttyAMA2 dev/ttyAMA2 none bind,optional,create=file
 lxc.mount.entry = /dev/ttyAMA3 dev/ttyAMA3 none bind,optional,create=file
 lxc.mount.entry = /dev/ttyAMA4 dev/ttyAMA4 none bind,optional,create=file
-lxc.mount.entry = /dev/ttyUSB0 dev/ttyUSB0 none bind,optional,create=file
-lxc.mount.entry = /dev/ttyUSB1 dev/ttyUSB1 none bind,optional,create=file
-lxc.mount.entry = /dev/ttyUSB2 dev/ttyUSB2 none bind,optional,create=file
-lxc.mount.entry = /dev/ttyUSB3 dev/ttyUSB3 none bind,optional,create=file
 lxc.mount.entry = /sys/class/i2c-dev/i2c-6/device/6-0050/eeprom dev/eeprom none bind,optional,create=file
 
 lxc.cgroup2.devices.allow = c 180:* rwm
 lxc.mount.entry = /dev/cdc-wdm0 dev/cdc-wdm0 none bind,optional,create=file
+
+lxc.mount.entry = /media media none bind,optional,create=dir

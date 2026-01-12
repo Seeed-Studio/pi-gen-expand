@@ -39,16 +39,14 @@ fi
 rm /tmp/openwrt-rootfs.tar.gz
 EOF
 
-if [ -d "files" ]; then
-    if [ "$SEEED_DEV_NAME" == "reComputer-R100x" ]; then
-        log "Begin copy files for seeed $SEEED_DEV_NAME"
-        chmod +x ./files/lxc-device.sh
-        cp ./files/$SEEED_DEV_NAME/lxc-device.sh ${ROOTFS_DIR}/usr/local/bin/
-        cp ./files/$SEEED_DEV_NAME/lxc-device.service ${ROOTFS_DIR}/lib/systemd/system/
-        on_chroot << EOF
+if [ -f "files/$SEEED_DEV_NAME/lxc-device.sh" ] && [ -f "files/$SEEED_DEV_NAME/lxc-device.service" ]; then
+    log "Begin copy files for seeed $SEEED_DEV_NAME"
+    chmod +x ./files/$SEEED_DEV_NAME/lxc-device.sh
+    cp ./files/$SEEED_DEV_NAME/lxc-device.sh ${ROOTFS_DIR}/usr/local/bin/
+    cp ./files/$SEEED_DEV_NAME/lxc-device.service ${ROOTFS_DIR}/lib/systemd/system/
+    on_chroot << EOF
 systemctl daemon-reload
 systemctl enable lxc-device.service
 EOF
-    fi
 fi
 
