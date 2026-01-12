@@ -26,7 +26,10 @@ lxc.cgroup2.devices.allow = c 188:* rwm
 lxc.cgroup2.devices.allow = c 204:* rwm
 lxc.mount.entry = /dev/i2c-6 dev/i2c-1 none bind,optional,create=file
 lxc.mount.entry = /dev/spidev1.1 dev/spidev0.1 none bind,optional,create=file
+lxc.mount.entry = /dev/gpiochip0 dev/gpiochip0 none bind,optional,create=file
+lxc.mount.entry = /dev/gpiochip1 dev/gpiochip1 none bind,optional,create=file
 lxc.mount.entry = /dev/gpiochip2 dev/gpiochip2 none bind,optional,create=file
+lxc.mount.entry = /dev/gpiochip3 dev/gpiochip3 none bind,optional,create=file
 lxc.mount.entry = /dev/ttyAMA2 dev/ttyAMA2 none bind,optional,create=file
 lxc.mount.entry = /dev/ttyAMA3 dev/ttyAMA3 none bind,optional,create=file
 lxc.mount.entry = /dev/ttyAMA4 dev/ttyAMA4 none bind,optional,create=file
