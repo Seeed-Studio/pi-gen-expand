@@ -17,7 +17,7 @@ wget https://github.com/Seeed-Studio/sensecap-openwrt-feed/releases/latest/downl
 
 # Create LXC container
 mkdir -p /var/lib/lxc/SenseCAP/rootfs
-tar --transform 's|^/||' --warning=no-file-ignored -xzf /tmp/openwrt-rootfs.tar.gz -C /var/lib/lxc/SenseCAP/rootfs || true
+tar --warning=no-file-ignored -xzf /tmp/openwrt-rootfs.tar.gz -C /var/lib/lxc/SenseCAP/rootfs || true
 
 # Create config file if not exists
 if [ ! -f /var/lib/lxc/SenseCAP/config ]; then
