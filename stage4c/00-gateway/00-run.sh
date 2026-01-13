@@ -30,6 +30,11 @@ if ! grep -q "lxc.start.auto" /var/lib/lxc/SenseCAP/config; then
     echo "lxc.start.auto = 1" >> /var/lib/lxc/SenseCAP/config
 fi
 
+# Fix Read-only file system error for GPIO
+if ! grep -q "lxc.mount.auto = sys:rw" /var/lib/lxc/SenseCAP/config; then
+    echo "lxc.mount.auto = sys:rw" >> /var/lib/lxc/SenseCAP/config
+fi
+
 # Clean up
 rm /tmp/openwrt-rootfs.tar.gz
 EOF
