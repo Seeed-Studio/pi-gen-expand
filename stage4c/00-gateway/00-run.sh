@@ -39,6 +39,12 @@ fi
 rm /tmp/openwrt-rootfs.tar.gz
 EOF
 
+if [ -f "files/$SEEED_DEV_NAME/hardware-config" ]; then
+    log "Begin copy files for seeed $SEEED_DEV_NAME"
+    mkdir -p ${ROOTFS_DIR}/var/lib/lxc/SenseCAP/rootfs/etc/config
+    cp ./files/$SEEED_DEV_NAME/hardware-config ${ROOTFS_DIR}/var/lib/lxc/SenseCAP/rootfs/etc/config/hardware
+fi
+
 if [ -f "files/$SEEED_DEV_NAME/lxc-device.sh" ] && [ -f "files/$SEEED_DEV_NAME/lxc-device.service" ]; then
     log "Begin copy files for seeed $SEEED_DEV_NAME"
     chmod +x ./files/$SEEED_DEV_NAME/lxc-device.sh
