@@ -27,6 +27,9 @@ lxc.cgroup2.devices.allow = c 153:* rwm
 lxc.cgroup2.devices.allow = c 188:* rwm
 lxc.cgroup2.devices.allow = c 204:* rwm
 lxc.mount.entry = /dev/i2c-6 dev/i2c-1 none bind,optional,create=file
+lxc.mount.entry = /dev/ttyAMA2 dev/RS485-1 none bind,optional,create=file
+lxc.mount.entry = /dev/ttyAMA3 dev/RS485-2 none bind,optional,create=file
+lxc.mount.entry = /dev/ttyAMA4 dev/RS485-3 none bind,optional,create=file
 lxc.mount.entry = /dev/spidev1.1 dev/spidev0.1 none bind,optional,create=file
 lxc.mount.entry = /sys/class/i2c-dev/i2c-6/device/6-0050/eeprom dev/eeprom none bind,optional,create=file
 
