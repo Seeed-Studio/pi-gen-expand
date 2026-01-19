@@ -56,3 +56,8 @@ systemctl enable lxc-device.service
 EOF
 fi
 
+if [ -f "files/$SEEED_DEV_NAME/board-config" ]; then
+    log "Appending board-config to config.txt for $SEEED_DEV_NAME"
+    cat ./files/$SEEED_DEV_NAME/board-config >> ${ROOTFS_DIR}/boot/firmware/config.txt
+fi
+
