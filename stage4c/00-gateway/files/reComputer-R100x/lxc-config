@@ -3,6 +3,8 @@ lxc.start.auto = 1
 
 # Distribution configuration
 lxc.include = /usr/share/lxc/config/common.conf
+lxc.cap.drop = 
+lxc.cap.drop = mac_admin mac_override sys_module sys_rawio
 lxc.arch = aarch64
 
 # Container specific configuration
