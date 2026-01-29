@@ -38,6 +38,11 @@ lxc.mount.entry = /sys/class/i2c-dev/i2c-6/device/6-0050/eeprom dev/eeprom none 
 lxc.cgroup2.devices.allow = c 180:* rwm
 lxc.mount.entry = /dev/cdc-wdm0 dev/cdc-wdm0 none bind,optional,create=file
 
+# Allow USB storage access
 lxc.mount.entry = /media media none bind,optional,create=dir
+
 # Allow reboot and shutdown commands inside the container
 lxc.mount.entry = /proc/sysrq-trigger proc/sysrq-trigger none bind,optional,create=file 0 0
+
+# Allow container to modify hostname
+lxc.mount.entry = /proc/sys/kernel/ proc/sys/kernel/ none bind,optional,create=dir
