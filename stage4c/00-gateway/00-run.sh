@@ -8,6 +8,15 @@ if [ -f "files/$SEEED_DEV_NAME/lxc-config" ]; then
     cp ./files/$SEEED_DEV_NAME/lxc-config ${ROOTFS_DIR}/var/lib/lxc/SenseCAP/config
 fi
 
+# Install usb-automount service for auto-mounting USB drives
+chmod +x ./files/usb-automount.sh
+cp ./files/usb-automount.sh ${ROOTFS_DIR}/usr/local/bin/
+cp ./files/usb-automount.service ${ROOTFS_DIR}/etc/systemd/system/
+on_chroot << EOF
+systemctl daemon-reload
+systemctl enable usb-automount.service
+EOF
+
 # For security authentication, change http in apt source to https
 on_chroot << EOF
 set -x
