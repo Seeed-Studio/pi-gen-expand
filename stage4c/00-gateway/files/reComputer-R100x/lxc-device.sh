@@ -16,25 +16,16 @@ main() {
     while true; do
         # Check if container is running
         if sudo lxc-info -n "$CONTAINER_NAME" 2>/dev/null | grep -q "RUNNING"; then
-            # Check and map ttyUSB2
-            if [ -e "/dev/ttyUSB2" ]; then
-                if ! sudo lxc-attach -n "$CONTAINER_NAME" -- test -e "/dev/ttyUSB2" 2>/dev/null; then
-                    log_message "Mapping /dev/ttyUSB2 to container"
-                    sudo lxc-device -n "$CONTAINER_NAME" add "/dev/ttyUSB2" 
+            for iface in $(ip -o link show | awk -F': ' '{print $2}' | grep -v '@'); do
+                # Skip eth1, lo, lxcbr0 interfaces
+                [[ "$iface" =~ ^(eth1|lo|lxcbr0) ]] && continue
+                
+                # Map if not already mapped
+                if ip link show "$iface" &>/dev/null; then
+                    log_message "Mapping $iface to container"
+                    sudo lxc-device -n "$CONTAINER_NAME" add "$iface" 
                 fi
-            fi
-            
-            # Check and map wwan0
-            if ip link show wwan0 &>/dev/null; then
-                log_message "Mapping wwan0 to container"
-                sudo lxc-device -n "$CONTAINER_NAME" add "wwan0"
-            fi
-
-            # Check and map wlan0
-            if ip link show wlan0 &>/dev/null; then
-                log_message "Mapping wlan0 to container"
-                sudo lxc-device -n "$CONTAINER_NAME" add "wlan0"
-            fi
+            done
         fi
         
         sleep 10
