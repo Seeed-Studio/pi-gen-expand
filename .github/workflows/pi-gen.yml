@@ -75,7 +75,7 @@ env:
   
 jobs:
   pi-gen-image:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Set up swap space
         run: |
@@ -159,6 +159,27 @@ jobs:
           fi
           echo "release=$REL" >> "$GITHUB_OUTPUT"
           echo "Detected release codename: $REL"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Ensure arm64 binfmt is available
+        run: |
+          sudo modprobe binfmt_misc || true
+          sudo mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc || true
+          docker run --rm --privileged tonistiigi/binfmt --install arm64
+
+          if [ ! -f /proc/sys/fs/binfmt_misc/qemu-aarch64 ]; then
+            echo "::error::qemu-aarch64 binfmt entry not found"
+            ls -la /proc/sys/fs/binfmt_misc || true
+            exit 1
+          fi
+
+          echo "qemu-aarch64 registered:"
+          cat /proc/sys/fs/binfmt_misc/qemu-aarch64 || true
+          docker run --rm --platform linux/arm64 alpine:3.20 uname -m
 
       - name: Build ${{ inputs.dev_name }} with stagelists
         uses: usimd/pi-gen-action@v1
