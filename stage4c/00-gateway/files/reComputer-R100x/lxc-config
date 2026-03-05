@@ -39,7 +39,7 @@ lxc.cgroup2.devices.allow = c 180:* rwm
 lxc.mount.entry = /dev/cdc-wdm0 dev/cdc-wdm0 none bind,optional,create=file
 
 # Allow USB storage access
-lxc.mount.entry = /media media none bind,optional,create=dir
+lxc.mount.entry = /media media none rbind,optional,create=dir
 
 # Allow reboot and shutdown commands inside the container
 lxc.mount.entry = /proc/sysrq-trigger proc/sysrq-trigger none bind,optional,create=file 0 0
