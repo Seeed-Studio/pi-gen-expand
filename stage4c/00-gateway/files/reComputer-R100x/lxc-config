@@ -46,3 +46,6 @@ lxc.mount.entry = /proc/sysrq-trigger proc/sysrq-trigger none bind,optional,crea
 
 # Allow container to modify hostname
 lxc.mount.entry = /proc/sys/kernel/ proc/sys/kernel/ none bind,optional,create=dir
+
+# OpenVPN tun device support
+lxc.mount.entry = /dev/net dev/net none bind,create=dir
