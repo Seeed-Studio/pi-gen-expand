@@ -44,6 +44,14 @@ if ! grep -q "lxc.mount.auto = sys:rw" /var/lib/lxc/SenseCAP/config; then
     echo "lxc.mount.auto = sys:rw" >> /var/lib/lxc/SenseCAP/config
 fi
 
+# Record version info to host and mount to container as read-only
+date +"%y-%m-%d" > /etc/os_version
+if ! grep -q "lxc.mount.entry = /etc/os_version" /var/lib/lxc/SenseCAP/config; then
+    mkdir -p /var/lib/lxc/SenseCAP/rootfs/etc/deviceinfo
+    touch /var/lib/lxc/SenseCAP/rootfs/etc/deviceinfo/os_version
+    echo "lxc.mount.entry = /etc/os_version etc/deviceinfo/os_version none bind,ro,create=file 0 0" >> /var/lib/lxc/SenseCAP/config
+fi
+
 # Clean up
 rm /tmp/openwrt-rootfs.tar.gz
 EOF
