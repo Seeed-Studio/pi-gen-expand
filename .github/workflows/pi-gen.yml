@@ -79,14 +79,14 @@ jobs:
     steps:
       - name: Set up swap space
         run: |
-          # Clean up any existing swap file first
-          sudo swapoff /swapfile 2>/dev/null || true
-          sudo rm -f /swapfile
-          # Create new swap file
-          sudo fallocate -l 4G /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
+          SWAPFILE="/tmp/ci-swapfile"
+          # Avoid /swapfile conflicts on hosted runners by using a dedicated file.
+          sudo swapoff "$SWAPFILE" 2>/dev/null || true
+          sudo rm -f "$SWAPFILE"
+          sudo dd if=/dev/zero of="$SWAPFILE" bs=1M count=4096 status=none
+          sudo chmod 600 "$SWAPFILE"
+          sudo mkswap "$SWAPFILE"
+          sudo swapon "$SWAPFILE"
           swapon --show
           free -h
           
