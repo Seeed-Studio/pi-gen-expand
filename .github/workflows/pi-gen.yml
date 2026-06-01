@@ -79,14 +79,12 @@ jobs:
     steps:
       - name: Set up swap space
         run: |
-          SWAPFILE="/tmp/ci-swapfile"
-          # Avoid /swapfile conflicts on hosted runners by using a dedicated file.
-          sudo swapoff "$SWAPFILE" 2>/dev/null || true
-          sudo rm -f "$SWAPFILE"
-          sudo dd if=/dev/zero of="$SWAPFILE" bs=1M count=4096 status=none
-          sudo chmod 600 "$SWAPFILE"
-          sudo mkswap "$SWAPFILE"
-          sudo swapon "$SWAPFILE"
+          sudo swapoff /swapfile 2>/dev/null || true
+          sudo rm -f /swapfile
+          sudo fallocate -l 4G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
           swapon --show
           free -h
           
@@ -170,13 +168,11 @@ jobs:
           sudo modprobe binfmt_misc || true
           sudo mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc || true
           docker run --rm --privileged tonistiigi/binfmt --install arm64
-
           if [ ! -f /proc/sys/fs/binfmt_misc/qemu-aarch64 ]; then
             echo "::error::qemu-aarch64 binfmt entry not found"
             ls -la /proc/sys/fs/binfmt_misc || true
             exit 1
           fi
-
           echo "qemu-aarch64 registered:"
           cat /proc/sys/fs/binfmt_misc/qemu-aarch64 || true
           docker run --rm --platform linux/arm64 alpine:3.20 uname -m
