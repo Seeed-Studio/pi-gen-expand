@@ -16,6 +16,7 @@ if [ "X$GIT_MODULE" != "X" ]; then
 	on_chroot << EOF
 cd ${MODULE_PATH}
 dpkg -l | grep kernel
+sed -i 's/--allow-downgrade/--allow-downgrades/g' scripts/reTerminal.sh
 ./scripts/reTerminal.sh --device ${SEEED_DEV_NAME}
 EOF
 
