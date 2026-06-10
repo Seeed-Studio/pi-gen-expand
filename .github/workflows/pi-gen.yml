@@ -158,6 +158,16 @@ jobs:
           echo "release=$REL" >> "$GITHUB_OUTPUT"
           echo "Detected release codename: $REL"
 
+      - name: Patch pi-gen-action to fix runner cleanup
+        run: |
+          ACTION_DIST=$(find "$RUNNER_TEMP/../_actions/usimd/pi-gen-action" -name "index.js" -path "*/dist/*" 2>/dev/null | head -1)
+          if [ -n "$ACTION_DIST" ]; then
+            sed -i 's/google-cloud-cli-anthoscli//' "$ACTION_DIST"
+            echo "Patched $ACTION_DIST"
+          else
+            echo "Warning: action dist not found, skipping patch"
+          fi
+
       - name: Build ${{ inputs.dev_name }} with stagelists
         uses: usimd/pi-gen-action@v1
         id: build
