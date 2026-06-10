@@ -72,9 +72,13 @@ if [ -d "files" ]; then
         chmod +x ./files/r21_board_detect.sh
         cp ./files/r21_board_detect.sh ${ROOTFS_DIR}/usr/local/bin/
         cp ./files/r21_board_detect.service ${ROOTFS_DIR}/lib/systemd/system/
+        chmod +x ./files/4g_module_init.sh
+        cp ./files/4g_module_init.sh ${ROOTFS_DIR}/usr/local/bin/
+        cp ./files/4g_module_init.service ${ROOTFS_DIR}/lib/systemd/system/
         on_chroot << EOF
 systemctl daemon-reload
 systemctl enable r21_board_detect.service
+systemctl enable 4g_module_init.service
 EOF
         log "End copy files special for seeed $SEEED_DEV_NAME"
     else

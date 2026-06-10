@@ -1,0 +1,10 @@
+[Unit]
+Description=4G Module Init Service (GPIO 639 Pull High)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/4g_module_init.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target
