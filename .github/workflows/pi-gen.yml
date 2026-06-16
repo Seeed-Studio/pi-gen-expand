@@ -75,12 +75,11 @@ env:
   
 jobs:
   pi-gen-image:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Set up swap space
         run: |
           sudo swapoff /swapfile 2>/dev/null || true
-          sudo rm -f /swapfile
           sudo fallocate -l 4G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
@@ -158,6 +157,9 @@ jobs:
           echo "release=$REL" >> "$GITHUB_OUTPUT"
           echo "Detected release codename: $REL"
 
+      - name: Setup binfmt_misc for arm64 emulation
+        run: docker run --privileged --rm tonistiigi/binfmt --install arm64
+
       - name: Build ${{ inputs.dev_name }} with stagelists
         uses: usimd/pi-gen-action@v1
         id: build
@@ -177,7 +179,7 @@ jobs:
           username: ${{ inputs.username }}
           password: ${{ inputs.password }}
           hostname: ${{ inputs.dev_name }}
-          increase-runner-disk-size: true
+          increase-runner-disk-size: false
           release: ${{ steps.extract_release.outputs.release }}
 
       - name: Upload ${{ inputs.dev_name }} image
