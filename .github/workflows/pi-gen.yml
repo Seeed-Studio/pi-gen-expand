@@ -87,7 +87,7 @@ jobs:
           swapon --show
           free -h
           
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -184,7 +184,7 @@ jobs:
 
       - name: Upload ${{ inputs.dev_name }} image
         id: artifact-upload-step
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Raspbian-${{ inputs.dev_name }}-${{ inputs.pi-gen-version }}
           path: ${{ steps.build.outputs.image-path }}
