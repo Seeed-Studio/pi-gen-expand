@@ -1,0 +1,12 @@
+# Interface mapping policy for lxc-device.sh.
+#
+# Only interfaces matching INCLUDE_RE are mapped into SenseCAP. Interfaces
+# matching EXCLUDE_RE are always kept on the host. Update the patterns and
+# restart lxc-device.service after editing this file.
+#
+# Examples:
+# EXCLUDE_RE="^(eth1|lo|lxcbr0|br-lan|docker0)"
+# INCLUDE_RE="^(wwan|wlan|enx|usb|eth2)"
+
+EXCLUDE_RE="^(eth1|lo|lxcbr0)"
+INCLUDE_RE="^(wwan|wlan|enx|usb)"

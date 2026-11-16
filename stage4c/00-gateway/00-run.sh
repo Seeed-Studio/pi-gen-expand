@@ -67,6 +67,9 @@ if [ -f "files/$SEEED_DEV_NAME/lxc-device.sh" ] && [ -f "files/$SEEED_DEV_NAME/l
     chmod +x ./files/$SEEED_DEV_NAME/lxc-device.sh
     cp ./files/$SEEED_DEV_NAME/lxc-device.sh ${ROOTFS_DIR}/usr/local/bin/
     cp ./files/$SEEED_DEV_NAME/lxc-device.service ${ROOTFS_DIR}/lib/systemd/system/
+    if [ -f "files/$SEEED_DEV_NAME/lxc-device.default" ]; then
+        cp ./files/$SEEED_DEV_NAME/lxc-device.default ${ROOTFS_DIR}/etc/default/lxc-device
+    fi
     on_chroot << EOF
 systemctl daemon-reload
 systemctl enable lxc-device.service
