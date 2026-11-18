@@ -37,8 +37,8 @@ on:
         default: 'stage0 stage1 stage2 stage3 stage4 stage4a'
         type: string
       wpa-country:
-        description: 'Set the country code for WPA'
-        required: true
+        description: 'Wi-Fi country code (default CN). Pass "none" to leave it unset: no ieee80211_regdom in cmdline.txt, regdom is then applied at runtime from the EEPROM freq plan.'
+        required: false
         default: 'CN'
         type: string
       keyboard-keymap:
@@ -191,7 +191,9 @@ jobs:
           pi-gen-version: ${{ inputs.pi-gen-version }}
           enable-ssh: ${{ inputs.enable-ssh }}
           disable-first-boot-user-rename: ${{ inputs.disable-first-boot-user-rename }}
-          wpa-country: ${{ inputs.wpa-country }}
+          # "none" (or an empty input) skips WPA_COUNTRY entirely, so pi-gen
+          # does not inject cfg80211.ieee80211_regdom into cmdline.txt.
+          wpa-country: ${{ inputs.wpa-country != 'none' && inputs.wpa-country || '' }}
           keyboard-keymap: ${{ inputs.keyboard-keymap }}
           stage-list: ${{ inputs.stage-list }}
           pi-gen-dir: ${{ env.PI_GEN_DIR }}
