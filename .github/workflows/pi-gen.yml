@@ -182,7 +182,7 @@ jobs:
           docker run --rm --platform linux/arm64 alpine:3.20 uname -m
 
       - name: Build ${{ inputs.dev_name }} with stagelists
-        uses: usimd/pi-gen-action@v1
+        uses: usimd/pi-gen-action@v2
         id: build
         with:
           compression: xz
