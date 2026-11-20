@@ -81,3 +81,9 @@ if [ -f "files/$SEEED_DEV_NAME/board-config" ]; then
     cat ./files/$SEEED_DEV_NAME/board-config >> ${ROOTFS_DIR}/boot/firmware/config.txt
 fi
 
+on_chroot << EOF
+rm -f /etc/sudoers.d/010_pi-nopasswd
+rm -f /etc/sudoers.d/010_wiz-nopasswd
+rm -f /etc/sudoers.d/010_rpi-first-boot-wizard
+EOF
+
