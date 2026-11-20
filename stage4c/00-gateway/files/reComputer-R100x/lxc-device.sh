@@ -20,6 +20,15 @@ main() {
     log_message "Container: $CONTAINER_NAME"
 
     while true; do
+        # Without a cmdline regdom, brcmfmac registers wlan as soft-blocked
+        # (classic Pi "no country" behavior) and nothing inside the container
+        # can bring the interface up. Unblock by type before handing it over.
+        for rf in /sys/class/rfkill/*; do
+            if [ "$(cat "$rf/type" 2>/dev/null)" = "wlan" ] && [ "$(cat "$rf/soft" 2>/dev/null)" = "1" ]; then
+                echo 0 > "$rf/soft" 2>/dev/null && log_message "Unblocked rfkill for wlan"
+            fi
+        done
+
         if sudo lxc-info -n "$CONTAINER_NAME" 2>/dev/null | grep -q "RUNNING"; then
             for iface in $(ip -o link show | awk -F': ' '{print $2}' | grep -v '@'); do
                 [[ "$iface" =~ $EXCLUDE_RE ]] && continue
