@@ -87,3 +87,9 @@ rm -f /etc/sudoers.d/010_wiz-nopasswd
 rm -f /etc/sudoers.d/010_rpi-first-boot-wizard
 EOF
 
+# Load the WireGuard kernel module at boot. The module ships with the
+# host kernel; containers (shared kernel) only need kmod placeholders
+# to satisfy package deps and userland tools from opkg.
+mkdir -p ${ROOTFS_DIR}/etc/modules-load.d
+echo wireguard > ${ROOTFS_DIR}/etc/modules-load.d/wireguard.conf
+
