@@ -1,0 +1,386 @@
+name: Release SenseCAP Gateway OS
+
+# Builds the reComputer Gateway OS image and publishes it as a GitHub release
+# named "SenseCAP Gateway OS <gateway version>", e.g. "SenseCAP Gateway OS v1.2.7".
+# The gateway version is read from the same upstream release that stage4c
+# (stage4c/00-gateway/00-run.sh) downloads the LXC rootfs from, so the tag
+# matches the firmware actually packed into the image.
+#
+# Release notes are AI-drafted (Zhipu GLM, OpenAI-compatible API) from three
+# sources: the upstream gateway firmware release body, this repo's commits
+# since the previous gateway-os-* tag, and an optional manual input. AI is
+# best effort: without the ZHIPU_API_KEY secret, or on any API failure, the
+# release falls back to the plain assembled notes.
+#
+# --latest=false keeps the repo's Latest badge on the pi-gen-expand release
+# line; gateway-os releases never take it over. Re-running an existing tag
+# only refreshes the assets and keeps any hand-edited notes.
+#
+# Optional repo config: secret ZHIPU_API_KEY; vars RELEASE_NOTES_MODEL
+# (default glm-5.3-flash), RELEASE_NOTES_LANG (default English).
+
+on:
+  workflow_dispatch:
+    inputs:
+      dev_name:
+        description: 'Name of device'
+        required: true
+        default: 'reComputer-R100x'
+        type: choice
+        options:
+          - reComputer-R100x
+          - reComputer-R110x
+          - reComputer-R2x
+          - reComputer-R22
+      pi-gen-version:
+        description: 'Branch or tag name known in the pi-gen repository.'
+        required: true
+        default: 'bookworm-arm64'
+        type: string
+      enable-ssh:
+        description: 'Enable SSH server'
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - 1
+          - 0
+      stage-list:
+        description: 'List of stage name to execute in given order (must end with stage4c for the gateway container).'
+        required: true
+        default: 'stage0 stage1 stage2 stage3 stage4 stage4a stage4c'
+        type: string
+      wpa-country:
+        description: 'Wi-Fi country code. "none" leaves it unset (regdom applied at runtime from EEPROM freq plan).'
+        required: false
+        default: 'none'
+        type: string
+      keyboard-keymap:
+        description: 'Set the keyboard keymap'
+        required: true
+        default: 'us'
+        type: string
+      disable-first-boot-user-rename:
+        description: 'Disable the renaming of the first user during the first boot.'
+        required: true
+        default: '1'
+        type: choice
+        options:
+          - 1
+          - 0
+      username:
+        description: 'Username for the image'
+        required: true
+        default: 'recomputer'
+        type: string
+      password:
+        description: 'Password for the image'
+        required: true
+        default: '12345678'
+        type: string
+      gateway_version:
+        description: 'Gateway firmware version (e.g. v1.2.7). Empty = auto-detect from the upstream latest release that stage4c pulls.'
+        required: false
+        default: ''
+        type: string
+      image_notes:
+        description: 'Extra image-side change notes, appended after the auto-generated commit list.'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  EXPORT_LAST_STAGE_ONLY: true
+  PI_GEN_DIR: 'pi-gen'
+  UPSTREAM_REPO: 'Seeed-Studio/sensecap-openwrt-feed'
+
+jobs:
+  gateway-os:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Set up swap space
+        run: |
+          SWAPFILE="/tmp/ci-swapfile"
+          # Avoid /swapfile conflicts on hosted runners by using a dedicated file.
+          sudo swapoff "$SWAPFILE" 2>/dev/null || true
+          sudo rm -f "$SWAPFILE"
+          sudo dd if=/dev/zero of="$SWAPFILE" bs=1M count=4096 status=none
+          sudo chmod 600 "$SWAPFILE"
+          sudo mkswap "$SWAPFILE"
+          sudo swapon "$SWAPFILE"
+          swapon --show
+          free -h
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: before Build
+        run: |
+          sudo apt-get remove aria2 ansible shellcheck rpm xorriso zsync \
+          clang-6.0 lldb-6.0 lld-6.0 clang-format-6.0 clang-8 lldb-8 lld-8 clang-format-8 \
+          clang-9 lldb-9 lld-9 clangd-9 clang-format-9 \
+          esl-erlang gfortran-8 gfortran-9 \
+          cabal-install-2.0 cabal-install-2.2 \
+          cabal-install-2.4 cabal-install-3.0 cabal-install-3.2 heroku imagemagick \
+          libmagickcore-dev libmagickwand-dev libmagic-dev ant ant-optional kubectl \
+          mercurial apt-transport-https mono-complete mysql-client libmysqlclient-dev \
+          mysql-server mssql-tools unixodbc-dev yarn bazel chrpath libssl-dev libxft-dev \
+          libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev \
+          php-zmq snmp pollinate libpq-dev postgresql-client ruby-full \
+          azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell \
+          sphinxsearch subversion mongodb-org -yq >/dev/null 2>&1 \
+          || echo "failed main apt-get remove"
+          echo "Removing large packages"
+          sudo apt-get remove -y '^dotnet-.*'
+          sudo apt-get remove -y '^llvm-.*'
+          sudo apt-get remove -y 'php.*'
+          sudo apt-get autoremove -y >/dev/null 2>&1
+          sudo apt-get clean
+          sudo apt-get autoremove -y >/dev/null 2>&1
+          sudo apt-get autoclean -y >/dev/null 2>&1
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          echo "remove big /usr/local"
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf /usr/local/lib/android >/dev/null 2>&1
+          sudo rm -rf /usr/share/dotnet/sdk > /dev/null 2>&1
+          sudo rm -rf /usr/share/dotnet/shared > /dev/null 2>&1
+          sudo rm -rf /usr/share/swift > /dev/null 2>&1
+          sudo -E apt-get -qq update
+          sudo -E apt-get -y install git jq
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          df -h
+
+      - name: Getting parameter configuration
+        run: |
+          if [ -d "dev_config/${{ inputs.dev_name }}" ]; then
+            cp -rf dev_config/${{ inputs.dev_name }}/* stage4a/00-dtoverlays/
+          fi
+          chmod +x stage4a/prerun.sh
+          chmod +x stage4a/00-dtoverlays/*.sh
+
+      - name: Resolve gateway version
+        id: gateway
+        env:
+          GATEWAY_VERSION: ${{ inputs.gateway_version }}
+        run: |
+          VER="$GATEWAY_VERSION"
+          if [ -z "$VER" ]; then
+            VER=$(curl -fsSL "https://github.com/$UPSTREAM_REPO/releases/latest/download/version.txt" \
+              | awk -F': ' '/^Version:/{print $2}')
+          fi
+          [[ "$VER" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::bad gateway version: '$VER'"; exit 1; }
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          echo "tag=gateway-os-$VER" >> "$GITHUB_OUTPUT"
+          echo "Gateway version: $VER (tag gateway-os-$VER)"
+
+      - name: Extract release codename
+        id: extract_release
+        run: |
+          VER='${{ inputs.pi-gen-version }}'
+          REL="${VER%%-*}"
+          if [[ "$REL" == *arm* ]]; then
+            REL=""
+          fi
+          echo "release=$REL" >> "$GITHUB_OUTPUT"
+          echo "Detected release codename: $REL"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Ensure arm64 binfmt is available
+        run: |
+          sudo modprobe binfmt_misc || true
+          sudo mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc || true
+          docker run --rm --privileged tonistiigi/binfmt --install arm64
+
+          if [ ! -f /proc/sys/fs/binfmt_misc/qemu-aarch64 ]; then
+            echo "::error::qemu-aarch64 binfmt entry not found"
+            ls -la /proc/sys/fs/binfmt_misc || true
+            exit 1
+          fi
+
+          echo "qemu-aarch64 registered:"
+          cat /proc/sys/fs/binfmt_misc/qemu-aarch64 || true
+          docker run --rm --platform linux/arm64 alpine:3.20 uname -m
+
+      - name: Build ${{ inputs.dev_name }} with stagelists
+        uses: usimd/pi-gen-action@v2
+        id: build
+        with:
+          compression: xz
+          compression-level: 9
+          image-name: ${{ inputs.dev_name }}
+          pi-gen-version: ${{ inputs.pi-gen-version }}
+          enable-ssh: ${{ inputs.enable-ssh }}
+          disable-first-boot-user-rename: ${{ inputs.disable-first-boot-user-rename }}
+          # "none" skips WPA_COUNTRY entirely, so pi-gen does not inject
+          # cfg80211.ieee80211_regdom into cmdline.txt.
+          wpa-country: ${{ inputs.wpa-country != 'none' && inputs.wpa-country || '' }}
+          keyboard-keymap: ${{ inputs.keyboard-keymap }}
+          stage-list: ${{ inputs.stage-list }}
+          pi-gen-dir: ${{ env.PI_GEN_DIR }}
+          export-last-stage-only: ${{ env.EXPORT_LAST_STAGE_ONLY }}
+          verbose-output: 'false'
+          username: ${{ inputs.username }}
+          password: ${{ inputs.password }}
+          hostname: ${{ inputs.dev_name }}
+          increase-runner-disk-size: true
+          release: ${{ steps.extract_release.outputs.release }}
+
+      - name: Upload ${{ inputs.dev_name }} image
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gateway-OS-${{ inputs.dev_name }}-${{ steps.gateway.outputs.version }}
+          path: ${{ steps.build.outputs.image-path }}
+
+      - name: Assemble release notes
+        id: notes
+        env:
+          VER: ${{ steps.gateway.outputs.version }}
+          IMAGE_NOTES: ${{ inputs.image_notes }}
+        run: |
+          set -euo pipefail
+          IMAGE_PATH='${{ steps.build.outputs.image-path }}'
+          DEV='${{ inputs.dev_name }}'
+          TAG="gateway-os-$VER"
+          IMAGE_NAME="$TAG-$DEV-${{ inputs.pi-gen-version }}.tar.xz"
+
+          {
+            echo "Image: $IMAGE_NAME"
+            echo "Gateway Version: $VER"
+            echo "Build Date: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            echo "Device: $DEV"
+            echo "Username: ${{ inputs.username }}"
+            echo "Password: ${{ inputs.password }}"
+            echo "OpenWrt (LuCI/SSH in the SenseCAP container): root / (no password)"
+            echo "Enable SSH: ${{ inputs.enable-ssh }}"
+            echo "Stage List: ${{ inputs.stage-list }}"
+            echo "size: $(du -h "$IMAGE_PATH" | awk '{print $1}')"
+          } > "$DEV-info.txt"
+
+          {
+            echo "## Default credentials"
+            echo
+            echo "- Device (SSH / console login): \`${{ inputs.username }}\` / \`${{ inputs.password }}\`"
+            echo "- OpenWrt (LuCI web / SSH in the SenseCAP container): \`root\` / no password"
+            echo
+            echo "## Gateway firmware $VER"
+            echo
+            BODY=$(curl -fsSL "https://api.github.com/repos/$UPSTREAM_REPO/releases/tags/$VER" \
+              | jq -r '.body // empty') || BODY=""
+            if [ -n "$BODY" ]; then
+              echo "$BODY"
+            else
+              echo "(no upstream release notes provided)"
+            fi
+            echo
+            echo "## Image changes (pi-gen-expand)"
+            echo
+            # grep exits 1 when there is no previous gateway-os tag yet; that
+            # just means this is the first release, not an error.
+            PREV=$(git tag --list 'gateway-os-*' --sort=-creatordate | grep -vx "$TAG" | head -1 || true)
+            if [ -n "$PREV" ]; then
+              echo "Changes since $PREV:"
+              git log --no-merges --pretty=format:'- %s (%h)' "$PREV"..HEAD
+            else
+              echo "First gateway-os release; recent commits:"
+              git log --no-merges --pretty=format:'- %s (%h)' -20
+            fi
+            echo
+            if [ -n "$IMAGE_NOTES" ]; then
+              echo
+              echo "$IMAGE_NOTES"
+            fi
+            echo
+            echo "## Image info"
+            echo
+            echo '```'
+            cat "$DEV-info.txt"
+            echo '```'
+          } > notes_raw.md
+          cp notes_raw.md notes.md
+          echo "notes_file=notes.md" >> "$GITHUB_OUTPUT"
+
+      # Best effort: a model outage or a missing key must never block a release.
+      - name: Draft release notes with GLM
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+          MODEL: ${{ vars.RELEASE_NOTES_MODEL || 'glm-5.3-flash' }}
+          LANG: ${{ vars.RELEASE_NOTES_LANG || 'English' }}
+        run: |
+          if [ -z "$ZHIPU_API_KEY" ]; then
+            echo "::warning::ZHIPU_API_KEY not set; using plain assembled release notes"
+            exit 0
+          fi
+          python3 - "$MODEL" "$LANG" <<'PY'
+          import json, os, sys, urllib.request
+
+          model, lang = sys.argv[1], sys.argv[2]
+          raw = open("notes_raw.md", encoding="utf-8").read()
+          prompt = (
+              "You are the release manager of an open-source project. Turn the raw material "
+              "below into polished GitHub release notes for users flashing this image. "
+              f"Write in {lang}.\n"
+              "Hard requirements:\n"
+              "1. Keep the sections (Default credentials / Gateway firmware / Image changes / "
+              "Image info); headings may be reworded but their meaning stays;\n"
+              "2. Version numbers, the commit list, the Default credentials and the Image info "
+              "must be kept verbatim, no omissions;\n"
+              "3. Reword, group and summarise only what the material states; never invent "
+              "features, fixes or versions that are not in it;\n"
+              "4. Start with a one-sentence release summary;\n"
+              "5. Output Markdown body only, no code fence wrapping, no explanations.\n\n"
+              "Raw material:\n" + raw
+          )
+          req = urllib.request.Request(
+              "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+              data=json.dumps({
+                  "model": model,
+                  "messages": [{"role": "user", "content": prompt}],
+                  "temperature": 0.3,
+                  "max_tokens": 4096,
+              }).encode(),
+              headers={
+                  "Authorization": "Bearer " + os.environ["ZHIPU_API_KEY"],
+                  "Content-Type": "application/json",
+              },
+          )
+          with urllib.request.urlopen(req, timeout=120) as resp:
+              content = json.load(resp)["choices"][0]["message"]["content"].strip()
+          if not content:
+              sys.exit("empty AI response, keeping raw notes")
+          open("notes.md", "w", encoding="utf-8").write(content + "\n")
+          print("AI-drafted notes written to notes.md")
+          PY
+
+      - name: Create or update GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.gateway.outputs.tag }}
+          VER: ${{ steps.gateway.outputs.version }}
+          IMAGE_PATH: ${{ steps.build.outputs.image-path }}
+        run: |
+          DEV='${{ inputs.dev_name }}'
+          ASSET="${TAG}-${DEV}-${{ inputs.pi-gen-version }}.tar.xz"
+          cp "$IMAGE_PATH" "$ASSET"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            # Re-run: refresh assets only, keep any hand-edited notes.
+            gh release upload "$TAG" "$ASSET" "$DEV-info.txt" --clobber
+          else
+            gh release create "$TAG" "$ASSET" "$DEV-info.txt" \
+              --title "SenseCAP Gateway OS $VER" \
+              --latest=false \
+              --notes-file notes.md
+          fi
