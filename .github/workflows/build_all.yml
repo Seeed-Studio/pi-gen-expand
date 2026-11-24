@@ -100,7 +100,7 @@ jobs:
             inputs: >-
                 {
                     "dev_name": "reComputer-R2x",
-                    "pi-gen-version": "bookworm-arm64",
+                    "pi-gen-version": "arm64",
                     "enable-ssh": "1",
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a",
                     "wpa-country" : "CN",
@@ -119,7 +119,7 @@ jobs:
             inputs: >-
                 {
                     "dev_name": "reComputer-R22",
-                    "pi-gen-version": "bookworm-arm64",
+                    "pi-gen-version": "arm64",
                     "enable-ssh": "1",
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a",
                     "wpa-country" : "CN",
@@ -157,7 +157,7 @@ jobs:
             inputs: >-
                 {
                     "dev_name": "reComputer-AI-box-cm5", 
-                    "pi-gen-version": "bookworm-arm64", 
+                    "pi-gen-version": "arm64", 
                     "enable-ssh": "1", 
                     "stage-list": "stage0 stage1 stage2 stage3 stage4 stage4a", 
                     "wpa-country" : "CN", 
