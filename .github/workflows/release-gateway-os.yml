@@ -2,9 +2,9 @@ name: Release SenseCAP Gateway OS
 
 # Builds the reComputer Gateway OS image and publishes it as a GitHub release
 # named "SenseCAP Gateway OS <gateway version>", e.g. "SenseCAP Gateway OS v1.2.7".
-# The gateway version is read from the same upstream release that stage4c
-# (stage4c/00-gateway/00-run.sh) downloads the LXC rootfs from, so the tag
-# matches the firmware actually packed into the image.
+# The gateway_version input pins the firmware release that stage4c
+# (stage4c/00-gateway/00-run.sh) downloads the LXC rootfs from; empty takes
+# the upstream latest. The release tag always matches the packed firmware.
 #
 # Release notes are AI-drafted (Zhipu GLM, OpenAI-compatible API) from three
 # sources: the upstream gateway firmware release body, this repo's commits
@@ -79,7 +79,7 @@ on:
         default: '12345678'
         type: string
       gateway_version:
-        description: 'Gateway firmware version (e.g. v1.2.7). Empty = auto-detect from the upstream latest release that stage4c pulls.'
+        description: 'Gateway firmware release to pack and publish (e.g. v1.2.6). Empty = upstream latest release.'
         required: false
         default: ''
         type: string
@@ -177,6 +177,12 @@ jobs:
               | awk -F': ' '/^Version:/{print $2}')
           fi
           [[ "$VER" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::bad gateway version: '$VER'"; exit 1; }
+          if [ -n "$GATEWAY_VERSION" ]; then
+            # Fail fast; a 1-byte GET, since curl -f ignores a 404 on HEAD after redirect.
+            curl -fsSL -r 0-0 "https://github.com/$UPSTREAM_REPO/releases/download/$VER/openwrt-armsr-armv8-generic-rootfs.tar.gz" -o /dev/null \
+              || { echo "::error::release $VER has no rootfs asset"; exit 1; }
+            echo "docker_opts=-e GATEWAY_VERSION=$VER" >> "$GITHUB_OUTPUT"
+          fi
           echo "version=$VER" >> "$GITHUB_OUTPUT"
           echo "tag=gateway-os-$VER" >> "$GITHUB_OUTPUT"
           echo "Gateway version: $VER (tag gateway-os-$VER)"
@@ -236,6 +242,8 @@ jobs:
           hostname: ${{ inputs.dev_name }}
           increase-runner-disk-size: true
           release: ${{ steps.extract_release.outputs.release }}
+          # pi-gen runs in Docker, so the version reaches stage4c via the container env.
+          docker-opts: ${{ steps.gateway.outputs.docker_opts }}
 
       - name: Upload ${{ inputs.dev_name }} image
         uses: actions/upload-artifact@v4

@@ -17,12 +17,19 @@ systemctl daemon-reload
 systemctl enable usb-automount.service
 EOF
 
+# GATEWAY_VERSION pins the firmware release (e.g. v1.2.6); unset = latest.
+GATEWAY_VERSION="${GATEWAY_VERSION:-latest}"
+if [ "$GATEWAY_VERSION" = "latest" ]; then
+    GATEWAY_ROOTFS_URL="https://github.com/Seeed-Studio/sensecap-openwrt-feed/releases/latest/download"
+else
+    GATEWAY_ROOTFS_URL="https://github.com/Seeed-Studio/sensecap-openwrt-feed/releases/download/$GATEWAY_VERSION"
+fi
+
 # For security authentication, change http in apt source to https
 on_chroot << EOF
 set -x
 # Download LXC image from GitHub
-wget https://github.com/Seeed-Studio/sensecap-openwrt-feed/releases/latest/download/openwrt-armsr-armv8-generic-rootfs.tar.gz \
- -O /tmp/openwrt-rootfs.tar.gz
+wget "$GATEWAY_ROOTFS_URL/openwrt-armsr-armv8-generic-rootfs.tar.gz" -O /tmp/openwrt-rootfs.tar.gz
 
 # Create LXC container
 mkdir -p /var/lib/lxc/SenseCAP/rootfs
