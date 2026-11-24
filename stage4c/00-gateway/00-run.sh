@@ -93,3 +93,7 @@ EOF
 mkdir -p ${ROOTFS_DIR}/etc/modules-load.d
 echo wireguard > ${ROOTFS_DIR}/etc/modules-load.d/wireguard.conf
 
+if ! grep -q "cgroup_enable=memory" ${ROOTFS_DIR}/boot/firmware/cmdline.txt; then
+    sed -i 's/$/ cgroup_enable=memory/' ${ROOTFS_DIR}/boot/firmware/cmdline.txt
+fi
+

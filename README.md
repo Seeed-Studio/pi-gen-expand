@@ -19,3 +19,13 @@ This project aims to automatically generate Raspberry Pi systems adapted for mul
 | reComputer-R22-bookworm-arm64 | recomputer & 12345678   | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2025-11-05](https://seeedstudio88-my.sharepoint.com/personal/baozhu_zuo_seeedstudio88_onmicrosoft_com/_layouts/15/download.aspx?share=EYOjt8-GR11PtTAkk7vZ8CQBatfAX0Mu_A4MjdycKaecFw) |
 | reComputer-R22-arm64  | recomputer & 12345678   | 1          | stage0 stage1 stage2 stage3 stage4 stage4a  | [2026-01-09](https://seeedstudio88-my.sharepoint.com/personal/baozhu_zuo_seeedstudio88_onmicrosoft_com/_layouts/15/download.aspx?share=IQCrEgxB3GNQTbvQb4JHbUr1AclzIOpGPR--P6pTduMc5J4) |
 
+
+## Memory cgroup (R100x images)
+
+R100x images ship with `cgroup_enable=memory` appended to
+`/boot/firmware/cmdline.txt`, so containers (SenseCAP and user-added
+ones) can set memory limits (`memory.max` in the unified cgroup v2
+hierarchy). Without this the RPi boot firmware injects
+`cgroup_disable=memory` at boot and the memory controller is
+unavailable. To disable it, remove the parameter from cmdline.txt and
+reboot.
