@@ -270,7 +270,8 @@ jobs:
             echo "Device: $DEV"
             echo "Username: ${{ inputs.username }}"
             echo "Password: ${{ inputs.password }}"
-            echo "OpenWrt (LuCI/SSH in the SenseCAP container): root / (no password)"
+            echo "LuCI web in the SenseCAP container: admin / (no password)"
+            echo "SSH to the SenseCAP container: root / (no password)"
             echo "Enable SSH: ${{ inputs.enable-ssh }}"
             echo "Stage List: ${{ inputs.stage-list }}"
             echo "size: $(du -h "$IMAGE_PATH" | awk '{print $1}')"
@@ -280,7 +281,8 @@ jobs:
             echo "## Default credentials"
             echo
             echo "- Device (SSH / console login): \`${{ inputs.username }}\` / \`${{ inputs.password }}\`"
-            echo "- OpenWrt (LuCI web / SSH in the SenseCAP container): \`root\` / no password"
+            echo "- LuCI web in the SenseCAP container: \`admin\` / no password"
+            echo "- SSH to the SenseCAP container: \`root\` / no password"
             echo
             echo "## Gateway firmware $VER"
             echo
@@ -394,6 +396,7 @@ jobs:
             gh release upload "$TAG" "$ASSET" "$DEV-info.txt" --clobber
           else
             gh release create "$TAG" "$ASSET" "$DEV-info.txt" \
+              --target "$GITHUB_SHA" \
               --title "SenseCAP Gateway OS $VER" \
               --latest=false \
               --notes-file notes.md
