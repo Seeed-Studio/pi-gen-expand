@@ -17,6 +17,9 @@ systemctl daemon-reload
 systemctl enable usb-automount.service
 EOF
 
+# Keep host ModemManager away from the EC25 used by the container
+install -m 644 ./files/99-ec25-container.rules ${ROOTFS_DIR}/etc/udev/rules.d/
+
 # GATEWAY_VERSION pins the firmware release (e.g. v1.2.6); unset = latest.
 GATEWAY_VERSION="${GATEWAY_VERSION:-latest}"
 if [ "$GATEWAY_VERSION" = "latest" ]; then

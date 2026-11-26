@@ -1,0 +1,3 @@
+# EC25 is passed through to the SenseCAP LXC container; ModemManager must not touch it.
+# No ACTION filter: bind/change events rewrite the udev db entry and would drop the flag.
+SUBSYSTEM=="usb", ATTR{idVendor}=="2c7c", ATTR{idProduct}=="0125", ENV{ID_MM_DEVICE_IGNORE}="1"
