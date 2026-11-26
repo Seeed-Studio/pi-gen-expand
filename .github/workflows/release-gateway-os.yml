@@ -346,10 +346,12 @@ jobs:
               "Image info); headings may be reworded but their meaning stays;\n"
               "2. Version numbers, the commit list, the Default credentials and the Image info "
               "must be kept verbatim, no omissions;\n"
-              "3. Reword, group and summarise only what the material states; never invent "
+              "3. Preserve the extra image notes wherever possible; reword them or weave them "
+              "into the narrative, but never drop their meaning;\n"
+              "4. Reword, group and summarise only what the material states; never invent "
               "features, fixes or versions that are not in it;\n"
-              "4. Start with a one-sentence release summary;\n"
-              "5. Output Markdown body only, no code fence wrapping, no explanations.\n\n"
+              "5. Start with a one-sentence release summary;\n"
+              "6. Output Markdown body only, no code fence wrapping, no explanations.\n\n"
               "Raw material:\n" + raw
           )
           req = urllib.request.Request(
@@ -358,17 +360,21 @@ jobs:
                   "model": model,
                   "messages": [{"role": "user", "content": prompt}],
                   "temperature": 0.3,
-                  "max_tokens": 4096,
+                  "max_tokens": 16384,
+                  # thinking models burn the token budget on reasoning first, leaving
+                  # the visible content truncated or empty
+                  "thinking": {"type": "disabled"},
               }).encode(),
               headers={
                   "Authorization": "Bearer " + os.environ["ZHIPU_API_KEY"],
                   "Content-Type": "application/json",
               },
           )
-          with urllib.request.urlopen(req, timeout=120) as resp:
-              content = json.load(resp)["choices"][0]["message"]["content"].strip()
-          if not content:
-              sys.exit("empty AI response, keeping raw notes")
+          with urllib.request.urlopen(req, timeout=300) as resp:
+              choice = json.load(resp)["choices"][0]
+          content = choice["message"]["content"].strip()
+          if choice.get("finish_reason") != "stop" or not content:
+              sys.exit("AI response empty or truncated, keeping raw notes")
           open("notes.md", "w", encoding="utf-8").write(content + "\n")
           print("AI-drafted notes written to notes.md")
           PY
