@@ -9,10 +9,21 @@ LOG_TAG="[LXC-Device]"
 # user-managed interfaces must stay on the host.
 EXCLUDE_RE="^(eth1|lo|lxcbr0)"
 INCLUDE_RE="^(wwan|wlan|enx|usb)"
+WWAN_RE="^wwan"
 [ -f /etc/default/lxc-device ] && . /etc/default/lxc-device
 
 log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') ${LOG_TAG} $1"
+}
+
+# The container's netifd redials the moment the modem re-enumerates, before
+# wwan0 lands here, and then parks the LTE interface as unavailable for good.
+# Re-announcing the QMI device once wwan0 is in makes it redial.
+reannounce_qmi_device() {
+    log_message "Re-announcing QMI device to container"
+    sudo lxc-attach -n "$CONTAINER_NAME" -- /bin/sh -c \
+        'for u in /sys/class/usbmisc/cdc-wdm*/uevent; do [ -e "$u" ] && echo add > "$u"; done' \
+        || log_message "Failed to re-announce QMI device"
 }
 
 main() {
@@ -37,6 +48,7 @@ main() {
                 if ip link show "$iface" &>/dev/null; then
                     log_message "Mapping $iface to container"
                     sudo lxc-device -n "$CONTAINER_NAME" add "$iface"
+                    [[ "$iface" =~ $WWAN_RE ]] && reannounce_qmi_device
                 fi
             done
         fi
